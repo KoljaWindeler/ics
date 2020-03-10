@@ -83,6 +83,41 @@ Key | Type | Required | Description
 `lookahead` | `int` | `false` | The number of days that limits the forecast. Default 365
 `startswith` | `string` | `false` | A filter that will limit the display of events. E.g. if your file contains multiple entries and you only want to know one type at persensor, simply create multiple sensors and filter. Have a look at sensor 3 and 4 above
 
+## Automation
 
+Example 
 
+```yaml
+automation:
+  - alias: 'trash pickup msg'
+    initial_state: 'on'
+    trigger:
+      - platform: time_pattern
+        hours: 19
+        minutes: 00
+        seconds: 00
+    condition:
+        condition: or
+        conditions:
+        - condition: template
+          value_template: "{{ state_attr('states.sensor.ics_1', 'remaining') == "1" }}"
+        - condition: template
+          value_template: "{{ state_attr('states.sensor.ics_2', 'remaining') == "1" }}"
+        - condition: template
+          value_template: "{{ state_attr('states.sensor.ics_3', 'remaining') == "1" }}"
+```
 
+and create / send some beautiful messages like this:
+
+```yaml
+script:
+   seq_trash:
+      sequence:
+         - service: notify.pb
+           data_template:
+           title: "Trash pickup tomorrow"
+           message: >
+             {% if is_state_attr("sensor.ics_1", "remaining",1) %} {{states.sensor.ics_1.attributes.friendly_name}} pickup tomorrow.{% endif %}
+             {% if is_state_attr("sensor.ics_2", "remaining",1) %} {{states.sensor.ics_2.attributes.friendly_name}} pickup tomorrow.{% endif %}
+             {% if is_state_attr("sensor.ics_3", "remaining",1) %} {{states.sensor.ics_3.attributes.friendly_name}} pickup tomorrow.{% endif %}
+```
