@@ -1,0 +1,6 @@
+{
+  "name": "ICS",
+  "content_in_root": false,
+  "zip_release": false,
+  "iot_class": "Cloud Polling"
+}
