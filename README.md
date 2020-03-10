@@ -100,11 +100,11 @@ automation:
         condition: or
         conditions:
         - condition: template
-          value_template: "{{ state_attr('states.sensor.ics_1', 'remaining') == "1" }}"
+          value_template: "{{ state_attr('states.sensor.ics_1', 'remaining') == '1' }}"
         - condition: template
-          value_template: "{{ state_attr('states.sensor.ics_2', 'remaining') == "1" }}"
+          value_template: "{{ state_attr('states.sensor.ics_2', 'remaining') == '1' }}"
         - condition: template
-          value_template: "{{ state_attr('states.sensor.ics_3', 'remaining') == "1" }}"
+          value_template: "{{ state_attr('states.sensor.ics_3', 'remaining') == '1' }}"
 ```
 
 and create / send some beautiful messages like this:
