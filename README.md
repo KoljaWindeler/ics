@@ -10,6 +10,8 @@ Platform | Description
 -- | --
 `sensor` | Show date and remaining days to event
 
+![Example](example.png)
+
 ### Features
 
 - Supports ICS file with reoccuring events
