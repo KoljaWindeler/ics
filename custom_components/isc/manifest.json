@@ -1,0 +1,13 @@
+{
+  "domain": "ics",
+  "name": "ics",
+  "documentation": "https://github.com/KoljaWindeler/ics/blob/master/README.md",
+  "requirements": [
+    "recurring-ical-events",
+    "icalendar>=4.0.4"
+  ],
+  "dependencies": [],
+  "codeowners": [
+    "@KoljaWindeler"
+  ]
+}
