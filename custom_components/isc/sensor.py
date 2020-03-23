@@ -144,7 +144,7 @@ class ics_Sensor(Entity):
 
 		except:
 			print("\n\n============= ISC Integration Error ================")
-			print("unfortunatly ICS hit an error, please open a ticket at")
+			print("unfortunately ICS hit an error, please open a ticket at")
 			print("https://github.com/KoljaWindeler/ics/issues")
 			print("and paste the following output:\n")
 			print(traceback.format_exc())
