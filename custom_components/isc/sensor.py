@@ -141,10 +141,10 @@ class ics_Sensor(Entity):
 						date = e['DTSTART'].dt
 						self.ics['pickup_date'] = date.strftime(self._timeformat)
 						if(e.get('DTSTART').params['VALUE'] == 'DATE'):
-							rem = date - datetime.date.today()
+							rem = date - datetime.datetime.now(pytz.utc).date()
 						else:
-							rem = date - datetime.datetime.now(pytz.utc)
-						extra['remaining'] = rem.days+1
+							rem = date.date() - datetime.datetime.now(pytz.utc).date()
+						extra['remaining'] = rem.days
 						extra['description'] = self.fix_text(e['SUMMARY'])
 						if(extra['description'].startswith(self._sw)):
 							break
