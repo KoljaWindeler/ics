@@ -23,7 +23,13 @@ Platform | Description
 
 ### HACS
 
-The easiest way to add this to your Homeassistant installation is using [HACS](https://custom-components.github.io/hacs/) and add this repository as a custom repository. And then follow the instructions under [Configuration](#configuration) below.
+The easiest way to add this to your Homeassistant installation is using [HACS]. 
+
+It's recommended to restart Homeassistent directly after the installation without any change to the
+Configuration. Homeassistent will install the dependencies during the next reboot. Afterthat you can add
+and check the configuration without error messages. This is nothing special to this
+Integration but the same for all custom components.
+
 
 ### Manual
 
