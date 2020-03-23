@@ -129,12 +129,15 @@ class ics_Sensor(Entity):
 
 			if(len(reoccuring_events)>0):
 				for e in reoccuring_events:
-					if(e.has_key("SUMMARY")):
-						date = e["DTSTART"].dt
+					if(e.has_key('SUMMARY')):
+						date = e['DTSTART'].dt
 						self.ics['pickup_date'] = date.strftime(self._timeformat)
-						rem = date - datetime.datetime.now(pytz.utc)
+						if(e.get('DTSTART').params['VALUE'] == 'DATE'):
+							rem = date - datetime.date.today()
+						else:
+							rem = date - datetime.datetime.now(pytz.utc)
 						extra['remaining'] = rem.days+1
-						extra['description'] = self.fix_text(e["SUMMARY"])
+						extra['description'] = self.fix_text(e['SUMMARY'])
 						if(extra['description'].startswith(self._sw)):
 							break
 
