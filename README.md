@@ -17,6 +17,7 @@ Platform | Description
 - Supports ICS file with reoccuring events
 - Events can be filtered, so you can tell it to look only for certain events
 - Has an attribute that calculated the number of days, so you can easily run a automation trigger
+- Low CPU and network usage, as it only updates once per day (whenever the date changes)
 
 ## Installation
 
