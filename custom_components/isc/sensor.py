@@ -22,6 +22,7 @@ from icalendar import Calendar, Event
 import recurring_ical_events
 import datetime
 import pytz
+import traceback
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -142,6 +143,13 @@ class ics_Sensor(Entity):
 							break
 
 		except:
+			print("\n\n============= ISC Integration Error ================")
+			print("unfortunatly ICS hit an error, please open a ticket at")
+			print("https://github.com/KoljaWindeler/ics/issues")
+			print("and paste the following output:\n")
+			print(traceback.format_exc())
+			print("\nthanks, Kolja")
+			print("============= ISC Integration Error ================\n\n")
 			self.ics['pickup_date'] = "failure"
 
 	def update(self):
