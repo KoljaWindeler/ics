@@ -129,6 +129,13 @@ class ics_Sensor(Entity):
 			self.ics['pickup_date'] = "no pick up"
 
 			if(len(reoccuring_events)>0):
+				# sort events so strange ordered calerdar will be ok
+				try:
+					reoccuring_events = sorted(reoccuring_events, key=lambda x: x["DTSTART"].dt, reverse=False)
+				except:
+					print("sorting failure")
+					print(traceback.format_exc())
+				# loop, to find first events
 				for e in reoccuring_events:
 					if(e.has_key('SUMMARY')):
 						date = e['DTSTART'].dt
