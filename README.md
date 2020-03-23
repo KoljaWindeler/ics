@@ -25,10 +25,9 @@ Platform | Description
 
 The easiest way to add this to your Homeassistant installation is using [HACS]. 
 
-It's recommended to restart Homeassistent directly after the installation without any change to the
-Configuration. Homeassistent will install the dependencies during the next reboot. Afterthat you can add
-and check the configuration without error messages. This is nothing special to this
-Integration but the same for all custom components.
+It's recommended to restart Homeassistent directly after the installation without any change to the Configuration. 
+Homeassistent will install the dependencies during the next reboot. After that you can add and check the configuration without error messages. 
+This is nothing special to this Integration but the same for all custom components.
 
 
 ### Manual
@@ -38,7 +37,7 @@ Integration but the same for all custom components.
 3. In the `custom_components` directory (folder) create a new folder called `ics`.
 4. Download _all_ the files from the `custom_components/ics/` directory (folder) in this repository.
 5. Place the files you downloaded in the new directory (folder) you created.
-6. Follow the instructions under [Configuration](#configuration) below.
+6. Follow the instructions under [Configuration](#Configuration) below.
 
 Using your HA configuration directory (folder) as a starting point you should now also have this:
 
@@ -54,7 +53,7 @@ All you need to have is a link to a ICS file, e.g. https://www.rmg-gmbh.de/downl
 
 ##  Configuration 
 
-To enable the sensor, add the following lines to your `configuration.yaml` file:
+To enable the sensor, add the following lines to your `configuration.yaml` file and replace the link accordingly:
 
 ```yaml
 # Example entry for configuration.yaml
