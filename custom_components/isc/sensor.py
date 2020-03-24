@@ -17,7 +17,7 @@ import logging
 import unicodedata
 import voluptuous as vol
 
-from urllib.request import urlopen
+from urllib.request import urlopen, Request
 from icalendar import Calendar, Event
 import recurring_ical_events
 import datetime
@@ -118,7 +118,8 @@ class ics_Sensor(Entity):
 		self.ics['extra'] = extra
 
 		try:
-			cal_string = urlopen(self._url).read().decode('ISO-8859-1')
+			req = Request(url=self._url, data=None, headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'})
+			cal_string = urlopen(req).read().decode('ISO-8859-1')
 			cal = Calendar.from_ical(cal_string)
 
 			start_date = datetime.datetime.now()
