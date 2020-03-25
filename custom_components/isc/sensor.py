@@ -123,7 +123,7 @@ class ics_Sensor(Entity):
 			cal = Calendar.from_ical(cal_string)
 
 			start_date = datetime.datetime.now()
-			end_date = datetime.datetime.now() + datetime.timedelta(self._lookahead)
+			end_date = datetime.datetime.now() + datetime.timedelta(days = self._lookahead)
 
 			reoccuring_events = recurring_ical_events.of(cal).between(start_date, end_date)
 
@@ -147,7 +147,7 @@ class ics_Sensor(Entity):
 							rem = date.date() - datetime.datetime.now(pytz.utc).date()
 						extra['remaining'] = rem.days
 						extra['description'] = self.fix_text(e['SUMMARY'])
-						if(extra['description'].startswith(self._sw)):
+						if(extra['description'].startswith(self.fix_text(self._sw))):
 							break
 
 		except:
