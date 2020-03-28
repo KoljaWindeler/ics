@@ -36,12 +36,14 @@ CONF_ID = "id"
 CONF_TIMEFORMAT = "timeformat"
 CONF_LOOKAHEAD = "lookahead"
 CONF_SW = "startswith"
+CONF_SHOWREMAINING = "show_remaining"
 
 DEFAULT_NAME = "ics_sensor"
 DEFAULT_SW = ""
 DEFAULT_ID = 1
 DEFAULT_TIMEFORMAT = "%A, %d.%m.%Y"
 DEFAULT_LOOKAHEAD = 365
+DEFAULT_SHOWREMAINING = True
 
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
@@ -51,6 +53,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
 	vol.Optional(CONF_TIMEFORMAT, default=DEFAULT_TIMEFORMAT): cv.string,
 	vol.Optional(CONF_SW, default=DEFAULT_SW): cv.string,
 	vol.Optional(CONF_LOOKAHEAD, default=DEFAULT_LOOKAHEAD): vol.Coerce(int),
+	vol.Optional(CONF_SHOWREMAINING, default=DEFAULT_SHOWREMAINING): cv.boolean,
 })
 
 @asyncio.coroutine
@@ -62,16 +65,17 @@ def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
 	sw = config.get(CONF_SW)
 	timeformat = config.get(CONF_TIMEFORMAT)
 	lookahead = config.get(CONF_LOOKAHEAD)
+	showremaining = config.get(CONF_SHOWREMAINING)
 
 	devices = []
-	devices.append(ics_Sensor(hass, name, id, url, timeformat, lookahead, sw))
+	devices.append(ics_Sensor(hass, name, id, url, timeformat, lookahead, sw, showremaining))
 	async_add_devices(devices)
 
 
 class ics_Sensor(Entity):
 	"""Representation of a Sensor."""
 
-	def __init__(self,hass: HomeAssistantType,  name, id, url, timeformat, lookahead, sw):
+	def __init__(self,hass: HomeAssistantType,  name, id, url, timeformat, lookahead, sw, showremaining):
 		"""Initialize the sensor."""
 		self._state_attributes = None
 		self._state = None
@@ -80,6 +84,7 @@ class ics_Sensor(Entity):
 		self._sw = sw
 		self._timeformat = timeformat
 		self._lookahead = lookahead
+		self._showremaining = showremaining
 		self._lastUpdate = -1
 
 		self.entity_id = async_generate_entity_id(ENTITY_ID_FORMAT, "ics_" + str(id), hass=hass)
@@ -167,7 +172,7 @@ class ics_Sensor(Entity):
 		if self._lastUpdate != str(datetime.datetime.now().strftime("%d")):
 			self.get_data()
 		try:
-			if(self.ics['extra']['remaining']>0):
+			if(self.ics['extra']['remaining']>0 and self._showremaining):
 				self._state = self.ics['pickup_date'] + ' (%02i)' % self.ics['extra']['remaining']
 			else:
 				self._state = self.ics['pickup_date']
