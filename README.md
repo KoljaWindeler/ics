@@ -88,6 +88,7 @@ Key | Type | Required | Description
 `timeformat` | `string` | `false` | The format that is used to display the date, default is "%A, %d.%m.%Y"
 `lookahead` | `int` | `false` | The number of days that limits the forecast. Default 365
 `startswith` | `string` | `false` | A filter that will limit the display of events. E.g. if your file contains multiple entries and you only want to know one type at persensor, simply create multiple sensors and filter. Have a look at sensor 3 and 4 above
+`show_remaining` | `bool` | `false` | Indicates whether to show the remaining days in the sensor state, close to the date. Default: true
 
 ## Automation
 
