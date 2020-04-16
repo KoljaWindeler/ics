@@ -6,6 +6,7 @@
 				"Home Assistant Config folder\custom_components\sensor\" folder.
 """
 import asyncio
+import logging
 
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity import Entity, async_generate_entity_id
@@ -19,9 +20,9 @@ import voluptuous as vol
 
 from urllib.request import urlopen, Request
 from icalendar import Calendar, Event
+from tzlocal import get_localzone
 import recurring_ical_events
 import datetime
-import pytz
 import traceback
 
 
@@ -36,14 +37,18 @@ CONF_ID = "id"
 CONF_TIMEFORMAT = "timeformat"
 CONF_LOOKAHEAD = "lookahead"
 CONF_SW = "startswith"
-CONF_SHOWREMAINING = "show_remaining"
+CONF_SHOW_REMAINING = "show_remaining"
+CONF_SHOW_BLANK = "show_blank"
+CONF_FORCE_UPDATE = "force_update"
 
 DEFAULT_NAME = "ics_sensor"
 DEFAULT_SW = ""
 DEFAULT_ID = 1
 DEFAULT_TIMEFORMAT = "%A, %d.%m.%Y"
 DEFAULT_LOOKAHEAD = 365
-DEFAULT_SHOWREMAINING = True
+DEFAULT_SHOW_REMAINING = True
+DEFAULT_SHOW_BLANK = ""
+DEFAULT_FORCE_UPDATE = 0
 
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
@@ -53,7 +58,9 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
 	vol.Optional(CONF_TIMEFORMAT, default=DEFAULT_TIMEFORMAT): cv.string,
 	vol.Optional(CONF_SW, default=DEFAULT_SW): cv.string,
 	vol.Optional(CONF_LOOKAHEAD, default=DEFAULT_LOOKAHEAD): vol.Coerce(int),
-	vol.Optional(CONF_SHOWREMAINING, default=DEFAULT_SHOWREMAINING): cv.boolean,
+	vol.Optional(CONF_SHOW_REMAINING, default=DEFAULT_SHOW_REMAINING): cv.boolean,
+	vol.Optional(CONF_SHOW_BLANK, default=DEFAULT_SHOW_BLANK): cv.string,
+	vol.Optional(CONF_FORCE_UPDATE, default=DEFAULT_FORCE_UPDATE): vol.Coerce(int),
 })
 
 @asyncio.coroutine
@@ -65,17 +72,19 @@ def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
 	sw = config.get(CONF_SW)
 	timeformat = config.get(CONF_TIMEFORMAT)
 	lookahead = config.get(CONF_LOOKAHEAD)
-	showremaining = config.get(CONF_SHOWREMAINING)
+	show_remaining = config.get(CONF_SHOW_REMAINING)
+	show_blank = config.get(CONF_SHOW_BLANK)
+	force_update = config.get(CONF_FORCE_UPDATE)
 
 	devices = []
-	devices.append(ics_Sensor(hass, name, id, url, timeformat, lookahead, sw, showremaining))
+	devices.append(ics_Sensor(hass, name, id, url, timeformat, lookahead, sw, show_remaining, show_blank, force_update))
 	async_add_devices(devices)
 
 
 class ics_Sensor(Entity):
 	"""Representation of a Sensor."""
 
-	def __init__(self,hass: HomeAssistantType,  name, id, url, timeformat, lookahead, sw, showremaining):
+	def __init__(self,hass: HomeAssistantType,  name, id, url, timeformat, lookahead, sw, show_remaining, show_blank, force_update):
 		"""Initialize the sensor."""
 		self._state_attributes = None
 		self._state = None
@@ -84,8 +93,19 @@ class ics_Sensor(Entity):
 		self._sw = sw
 		self._timeformat = timeformat
 		self._lookahead = lookahead
-		self._showremaining = showremaining
+		self._show_remaining = show_remaining
+		self._show_blank = show_blank
+		self._force_update = force_update
 		self._lastUpdate = -1
+		self.ics = {
+			'extra':{
+				'datetime':None,
+				'remaining':-1,
+				'description':"-",
+				'last_updated': None,
+				},
+			'pickup_date': "-",
+			}
 
 		self.entity_id = async_generate_entity_id(ENTITY_ID_FORMAT, "ics_" + str(id), hass=hass)
 	@property
@@ -114,68 +134,99 @@ class ics_Sensor(Entity):
 		s = s.replace(chr(188), 'e')
 		return s
 
-	def get_data(self):
-		self.ics = {}
-		extra = {}
-		extra['description'] = "-"
-		extra['remaining'] = -1
-		self.ics['pickup_date'] = "-"
-		self.ics['extra'] = extra
+	def exc(self):
+		_LOGGER.error("\n\n============= ISC Integration Error ================")
+		_LOGGER.error("unfortunately ICS hit an error, please open a ticket at")
+		_LOGGER.error("https://github.com/KoljaWindeler/ics/issues")
+		_LOGGER.error("and paste the following output:\n")
+		_LOGGER.error(traceback.format_exc())
+		_LOGGER.error("\nthanks, Kolja")
+		_LOGGER.error("============= ISC Integration Error ================\n\n")
 
+
+	def get_data(self):
 		try:
 			req = Request(url=self._url, data=None, headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'})
 			cal_string = urlopen(req).read().decode('ISO-8859-1')
 			cal = Calendar.from_ical(cal_string)
 
-			start_date = datetime.datetime.now()
-			end_date = datetime.datetime.now() + datetime.timedelta(days = self._lookahead)
+			start_date = datetime.datetime.now().replace(minute=0, hour=0, second=0, microsecond=0)
+			end_date = start_date + datetime.timedelta(days=self._lookahead)
 
 			reoccuring_events = recurring_ical_events.of(cal).between(start_date, end_date)
+			try:
+				for i in reoccuring_events:
+					if(i.get("DTSTART").params['VALUE'] == 'DATE'):
+						d = i["DTSTART"].dt
+						i["DTSTART"].dt = datetime.datetime(d.year,d.month,d.day)
+					if(i["DTSTART"].dt.tzinfo == None or i["DTSTART"].dt.utcoffset() == None):
+						i["DTSTART"].dt = i["DTSTART"].dt.replace(tzinfo=get_localzone())
+				reoccuring_events = sorted(reoccuring_events, key=lambda x: x["DTSTART"].dt, reverse=False)
+			except:
+				self.exc()
 
-			self.ics['pickup_date'] = "no pick up"
+			et = None
+			self.ics['pickup_date'] = "no next event"
+			self.ics['extra']['last_updated'] = datetime.datetime.now(get_localzone()).replace(microsecond=0)
+			self.ics['extra']['datetime'] = None
+			self.ics['extra']['remaining'] = -1
+			self.ics['extra']['description'] = "-"
 
 			if(len(reoccuring_events)>0):
-				# sort events so strange ordered calerdar will be ok
-				try:
-					reoccuring_events = sorted(reoccuring_events, key=lambda x: x["DTSTART"].dt, reverse=False)
-				except:
-					print("sorting failure")
-					print(traceback.format_exc())
-				# loop, to find first events
 				for e in reoccuring_events:
-					if(e.has_key('SUMMARY')):
-						date = e['DTSTART'].dt
-						self.ics['pickup_date'] = date.strftime(self._timeformat)
-						if(e.get('DTSTART').params['VALUE'] == 'DATE'):
-							rem = date - datetime.datetime.now(pytz.utc).date()
-						else:
-							rem = date.date() - datetime.datetime.now(pytz.utc).date()
-						extra['remaining'] = rem.days
-						extra['description'] = self.fix_text(e['SUMMARY'])
-						if(extra['description'].startswith(self.fix_text(self._sw))):
-							break
+					event_date = e["DTSTART"].dt
 
+					event_summary = ""
+					if(e.has_key("SUMMARY")):
+						event_summary = self.fix_text(e["SUMMARY"])
+					elif(self._show_blank):
+						event_summary = self.fix_text(self._show_blank)
+
+					if(event_summary):
+						if(event_summary.startswith(self.fix_text(self._sw)) and event_date>datetime.datetime.now(get_localzone())):
+							if(et == None):
+								self.ics['pickup_date'] = event_date.strftime(self._timeformat)
+								self.ics['extra']['remaining'] = (event_date.date() - datetime.datetime.now(get_localzone()).date()).days
+								self.ics['extra']['description'] = event_summary
+								self.ics['extra']['datetime'] = event_date
+								et = event_date
+							elif(event_date == et):
+								self.ics['extra']['description'] += " / " + event_summary
+							else:
+								break
 		except:
-			print("\n\n============= ISC Integration Error ================")
-			print("unfortunately ICS hit an error, please open a ticket at")
-			print("https://github.com/KoljaWindeler/ics/issues")
-			print("and paste the following output:\n")
-			print(traceback.format_exc())
-			print("\nthanks, Kolja")
-			print("============= ISC Integration Error ================\n\n")
 			self.ics['pickup_date'] = "failure"
+			self.exc()
+
 
 	def update(self):
 		"""Fetch new state data for the sensor.
 		This is the only method that should fetch new data for Home Assistant.
 		"""
-		if self._lastUpdate != str(datetime.datetime.now().strftime("%d")):
-			self.get_data()
 		try:
-			if(self.ics['extra']['remaining']>0 and self._showremaining):
-				self._state = self.ics['pickup_date'] + ' (%02i)' % self.ics['extra']['remaining']
-			else:
-				self._state = self.ics['pickup_date']
+			# first run
+			if(self.ics['extra']['last_updated']==None):
+				self.get_data()
+
+			# update at midnight
+			elif(self.ics['extra']['last_updated'].day != datetime.datetime.now().day):
+				self.get_data()
+
+			# update if datetime exists (there was an event in reach) and it is past now (look for the next event)
+			if(self.ics['extra']['datetime']!=None):
+				if(self.ics['extra']['datetime']<datetime.datetime.now(get_localzone())):
+					self.get_data()
+
+			# force updates (this should be last in line to avoid running twice)
+			if(self.ics['extra']['last_updated']!=None and self._force_update>0):
+				if(self.ics['extra']['last_updated']+datetime.timedelta(seconds=self._force_update) < datetime.datetime.now(get_localzone())):
+					self.get_data()
+
+			# update states
 			self._state_attributes = self.ics['extra']
+			self._state = self.ics['pickup_date']
+			if(self._show_remaining):
+				self._state += ' (%02i)' % self.ics['extra']['remaining']
 		except:
 			self._state = "error"
+			self.exc()

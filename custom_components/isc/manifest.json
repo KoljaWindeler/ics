@@ -4,7 +4,8 @@
   "documentation": "https://github.com/KoljaWindeler/ics/blob/master/README.md",
   "requirements": [
     "recurring-ical-events",
-    "icalendar>=4.0.4"
+    "icalendar>=4.0.4",
+    "tzlocal"
   ],
   "dependencies": [],
   "codeowners": [

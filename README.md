@@ -17,7 +17,8 @@ Platform | Description
 - Supports ICS file with reoccuring events
 - Events can be filtered, so you can tell it to look only for certain events
 - Has an attribute that calculated the number of days, so you can easily run a automation trigger
-- Low CPU and network usage, as it only updates once per day (whenever the date changes)
+- Low CPU and network usage, as it only updates once per day (whenever the date changes) or when the event is over
+- If multiple events occure on the same time, all title will be shown, connected with "/"
 
 ## Installation
 
@@ -58,41 +59,75 @@ To enable the sensor, add the following lines to your `configuration.yaml` file 
 ```yaml
 # Example entry for configuration.yaml
 sensor:
+
   - platform: ics
     name: Packaging
     url: https://www.rmg-gmbh.de/download/Hamb%C3%BChren.ics
     id: 1
+
   - platform: ics
     name: Trash
     url: http://www.zacelle.de/privatkunden/muellabfuhr/abfuhrtermine/?tx_ckcellextermine_pi1%5Bot%5D=148&tx_ckcellextermine_pi1%5Bics%5D=0&tx_ckcellextermine_pi1%5Bstartingpoint%5D=234&type=3333
     id: 2
+
   - platform: ics
     name: Trash 2
     url: https://www.ab-peine.de/mcalendar/export_termine.php?menuid=185&area=141&year=2020
     startswith: Rest
     id: 3
+
   - platform: ics
-    name: Trash 3
+    name: Bio
     url: https://www.ab-peine.de/mcalendar/export_termine.php?menuid=185&area=141&year=2020
     startswith: Bio
     id: 4
+
+  - platform: ics
+    name: Work
+    url: https://calendar.google.com/calendar/ical/xxxxxxxxxxxxxgroup.calendar.google.com/private-xxxxxxxxxxxxxxx/basic.ics
+    timeformat: "%d.%m. %H:%M"
+    force_update: 600
+    show_remaining: false
+    id: 5
+
+  - platform: ics
+    name: Work today
+    url: https://calendar.google.com/calendar/ical/xxxxxxxxxxxxxgroup.calendar.google.com/private-xxxxxxxxxxxxxxx/basic.ics
+    timeformat: "%H:%M"
+    lookahead: 1
+    force_update: 600
+    show_remaining: false
+    id: 6
+
+  - platform: template
+    sensors:
+      ics_5_txt:
+        value_template: '{{ states.sensor.ics_5.attributes.description}} @ {{states.sensor.ics_5.state}}'
+        friendly_name: "Work Next"
+      ics_6_txt:
+        value_template: '{{ states.sensor.ics_6.attributes.description}} @ {{states.sensor.ics_6.state}}'
+        friendly_name: "Work today"
+
+
 ```
 
 ## Configuration options
 
-Key | Type | Required | Description
--- | -- | -- | --
-`name` | `string` | `true` | The name of the sensor
-`url` | `string` | `true` | The url to the ics file
-`id` | `int` | `false` | A number to identify your sensor later on. e.g. for id=1 the name will be sensor.ical_1
-`timeformat` | `string` | `false` | The format that is used to display the date, default is "%A, %d.%m.%Y"
-`lookahead` | `int` | `false` | The number of days that limits the forecast. Default 365
-`startswith` | `string` | `false` | A filter that will limit the display of events. E.g. if your file contains multiple entries and you only want to know one type at persensor, simply create multiple sensors and filter. Have a look at sensor 3 and 4 above
-`show_remaining` | `bool` | `false` | Indicates whether to show the remaining days in the sensor state, close to the date. Default: true
+Key | Type | Required | Default | Description
+-- | -- | -- | -- | --
+`name` | `string` | `true` | `None` |  The friendly name of the sensor
+`url` | `string` | `true` | `None` | The url to the ics file
+`id` | `int` | `false` | `None` | A number to identify your sensor later on. e.g. for id=1 the entity will be sensor.ical_1
+`timeformat` | `string` | `false` | `"%A, %d.%m.%Y"` | The format that is used to display the date
+`lookahead` | `int` | `false` | `365` | The number of days that limits the forecast. E.g. 1 will only show the events of today
+`startswith` | `string` | `false` | `""` | A filter that will limit the display of events. E.g. if your file contains multiple entries and you only want to know one type at persensor, simply create multiple sensors and filter. Have a look at sensor 3 and 4 above
+`show_remaining` | `bool` | `false` | `true` | Indicates whether to show the remaining days in the sensor state, close to the date.
+`show_blank` | `string` | `false` | `""` | Indicates whether to show empty events (events without title), and what should be used as title instead. e.g. "Meeting" would override appointments with empty title with the string "Meeting". An empty string (default) will avoid showing blank events.
+`force_update` | `int` | `false` | `0` | Force to update the data with given intervall (seconds). This can be useful if the calendar is very dynamic, but is pointless for almost static calendars. The calendar will reload at midnight regardless of this setting. 0 = Disabled
 
 ## Automation
 
-Example 
+Example
 
 ```yaml
 automation:
