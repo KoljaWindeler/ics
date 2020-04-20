@@ -1,0 +1,57 @@
+{
+    "config": {
+        "title": "ICS",
+        "step": {
+            "user": {
+                "title": "ICS",
+                "description": "Enter the sensor name and configure sensor parameters. More info on https://github.com/koljawindeler/ics#configuration-options",
+                "data": {
+                    "name": "Friendly name (can be changed later on) and title for the config flow (fix)",
+                    "url": "The url to the ics file. Usually http://domain/calendar.ics but can also be local file:///tmp/test.ics ",
+                    "id": "Unique number to identify your sensor later on. e.g. id=1 results in sensor.ical_1",
+                    "timeformat": "The format that is used to display the date (see http://strftime.org/).",
+                    "startswith": "Filter, e.g. 'Paula' will only show events that start with 'Paula'.(' ' = Disabled)" ,
+                    "lookahead": "The number of days that limits the forecast, e.g. 1 will only show the events of today",
+                    "show_blank": "Leave blank / ' ' to ignore events with no title",
+                    "force_update": "Force periodical updates every x sec. In addition to 'once the current event started'. 0=Disabled.",
+                    "show_remaining": "Show remaining days until the event in the state, e.g. (4)",
+                    "show_ongoing": "Show event that are ongoing, although start is in the past"
+                }
+            }
+        },
+        "error": {
+            "invalid_url": "The URL is not valid, could not download data.",
+            "invalid_ics": "The downloaded file can not be parsed, not a valid ICS file.",
+            "invalid_timeformat": "The timeformat is not valid (see http://strftime.org/)",
+            "invalid_small_id": "The ID must be >= 0",
+            "invalid_lookahead": "The lookahead must be >= 1"
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "ICS",
+                "description": "Enter the sensor name and configure sensor parameters. More info on https://github.com/koljawindeler/ics#configuration-options",
+                "data": {
+                    "name": "Friendly name (can be changed later on) and title for the config flow (fix)",
+                    "url": "The url to the ics file. Usually http://domain/calendar.ics but can also be local file:///tmp/test.ics ",
+                    "id": "Unique number to identify your sensor later on. e.g. id=1 results in sensor.ical_1",
+                    "timeformat": "The format that is used to display the date (see http://strftime.org/).",
+                    "startswith": "Filter, e.g. 'Paula' will only show events that start with 'Paula'.(' ' = Disabled)" ,
+                    "lookahead": "The number of days that limits the forecast, e.g. 1 will only show the events of today",
+                    "show_blank": "Leave blank / ' ' to ignore events with no title",
+                    "force_update": "Force periodical updates every x sec. In addition to 'once the current event started'. 0=Disabled.",
+                    "show_remaining": "Show remaining days until the event in the state, e.g. (4)",
+                    "show_ongoing": "Show event that are ongoing, although start is in the past"
+                }
+            }
+        },
+        "error": {
+            "invalid_url": "The URL is not valid, could not download data.",
+            "invalid_ics": "The downloaded file can not be parsed, not a valid ICS file.",
+            "invalid_timeformat": "The timeformat is not valid (see http://strftime.org/)",
+            "invalid_small_id": "The ID must be >= 0",
+            "invalid_lookahead": "The lookahead must be >= 1"
+        }
+    }
+}
