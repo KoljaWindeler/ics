@@ -52,7 +52,11 @@ custom_components/ics/sensor.py
 
 All you need to have is a link to a ICS file, e.g. https://www.rmg-gmbh.de/download/Hamb%C3%BChren.ics
 
-##  Configuration 
+## GUI configuration 
+
+As of 2020/04/20 config flow is supported and is the prefered way to setup the integration.
+
+## Manual configuration 
 
 To enable the sensor, add the following lines to your `configuration.yaml` file and replace the link accordingly:
 
@@ -80,6 +84,7 @@ sensor:
     name: Bio
     url: https://www.ab-peine.de/mcalendar/export_termine.php?menuid=185&area=141&year=2020
     startswith: Bio
+    show_ongoing: true
     id: 4
 
   - platform: ics
