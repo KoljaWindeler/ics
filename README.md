@@ -121,9 +121,10 @@ Key | Type | Required | Default | Description
 `timeformat` | `string` | `false` | `"%A, %d.%m.%Y"` | The format that is used to display the date
 `lookahead` | `int` | `false` | `365` | The number of days that limits the forecast. E.g. 1 will only show the events of today
 `startswith` | `string` | `false` | `""` | A filter that will limit the display of events. E.g. if your file contains multiple entries and you only want to know one type at persensor, simply create multiple sensors and filter. Have a look at sensor 3 and 4 above
-`show_remaining` | `bool` | `false` | `true` | Indicates whether to show the remaining days in the sensor state, close to the date.
 `show_blank` | `string` | `false` | `""` | Indicates whether to show empty events (events without title), and what should be used as title instead. e.g. "Meeting" would override appointments with empty title with the string "Meeting". An empty string (default) will avoid showing blank events.
 `force_update` | `int` | `false` | `0` | Force to update the data with given intervall (seconds). This can be useful if the calendar is very dynamic, but is pointless for almost static calendars. The calendar will reload at midnight regardless of this setting. 0 = Disabled
+`show_remaining` | `bool` | `false` | `true` | Indicates whether to show the remaining days in the sensor state, close to the date.
+`show_ongoing` | `bool` | `false` | `false` | Indicates whether to show events that have already started but not finished.
 
 ## Automation
 
