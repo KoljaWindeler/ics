@@ -122,7 +122,7 @@ Key | Type | Required | Default | Description
 -- | -- | -- | -- | --
 `name` | `string` | `true` | `None` |  The friendly name of the sensor
 `url` | `string` | `true` | `None` | The url to the ics file usually some weblink, but can also be local file e.g. https://www.rmg-gmbh.de/download/Hamb%C3%BChren.ics or file:///tmp/test.ics
-`id` | `int` | `false` | `None` | A number to identify your sensor later on. e.g. for id=1 the entity will be sensor.ics_1 using id 1 a second will result in sensor.ics_1_2
+`id` | `int` | `true` | `None` | A number to identify your sensor later on. e.g. for id=1 the entity will be sensor.ics_1 using id 1 a second will result in sensor.ics_1_2
 `timeformat` | `string` | `false` | `"%A, %d.%m.%Y"` | The format that is used to display the date see http://strftime.org/ for more infomation
 `lookahead` | `int` | `false` | `365` | The number of days that limits the forecast. E.g. 1 will only show the events of today
 `startswith` | `string` | `false` | `""` | A filter that will limit the display of events. E.g. if your file contains multiple entries and you only want to know one type at per sensor, simply create multiple sensors and filter. Have a look at sensor 3 and 4 above. startswith: Bio will ohne show events that start with Bio.
