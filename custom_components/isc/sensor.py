@@ -73,6 +73,7 @@ class ics_Sensor(Entity):
 				'end':None,
 				'remaining':-1,
 				'description':"-",
+				'location': '-',
 				'last_updated': None,
 				},
 			'pickup_date': "-",
@@ -154,6 +155,7 @@ class ics_Sensor(Entity):
 			self.ics['extra']['end'] = None
 			self.ics['extra']['remaining'] = -1
 			self.ics['extra']['description'] = "-"
+			self.ics['extra']['location'] = "-"
 
 			if(len(reoccuring_events)>0):
 				for e in reoccuring_events:
@@ -176,9 +178,13 @@ class ics_Sensor(Entity):
 									self.ics['extra']['end'] = e["DTEND"].dt
 								else:
 									self.ics['extra']['end'] = event_date
+								if(e.has_key("LOCATION")):
+									self.ics['extra']['location'] = self.fix_text(e["LOCATION"])
 								et = event_date
 							elif(event_date == et):
 								self.ics['extra']['description'] += " / " + event_summary
+								if(e.has_key("LOCATION")):
+									self.ics['extra']['location'] += " / " + self.fix_text(e["LOCATION"])
 								# store earliest end time
 								if(self.ics['extra']['end'] > e["DTEND"].dt):
 									self.ics['extra']['end'] = e["DTEND"].dt
