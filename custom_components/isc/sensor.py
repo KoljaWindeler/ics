@@ -132,8 +132,10 @@ class ics_Sensor(Entity):
 
 			# make all item TZ aware
 			for event in cal.walk('vevent'):
-				event["DTSTART"] = self.check_fix_date_tz(event["DTSTART"])
-				event["END"] = self.check_fix_date_tz(event["DTEND"])
+				if(event.has_key("DTSTART")):
+					event["DTSTART"] = self.check_fix_date_tz(event["DTSTART"])
+				if(event.has_key("DTEND")):
+					event["DTEND"] = self.check_fix_date_tz(event["DTEND"])
 			
 			# define calendar range
 			start_date = datetime.datetime.now().replace(minute=0, hour=0, second=0, microsecond=0)
@@ -170,7 +172,10 @@ class ics_Sensor(Entity):
 								self.ics['extra']['remaining'] = (event_date.date() - datetime.datetime.now(get_localzone()).date()).days
 								self.ics['extra']['description'] = event_summary
 								self.ics['extra']['start'] = event_date
-								self.ics['extra']['end'] = e["DTEND"].dt
+								if(e.has_key("DTEND")):
+									self.ics['extra']['end'] = e["DTEND"].dt
+								else:
+									self.ics['extra']['end'] = event_date
 								et = event_date
 							elif(event_date == et):
 								self.ics['extra']['description'] += " / " + event_summary
