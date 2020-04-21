@@ -1,5 +1,7 @@
 """ config flow """
 from homeassistant.core import callback
+from homeassistant.helpers.entity import async_generate_entity_id
+from homeassistant.components.sensor import ENTITY_ID_FORMAT
 from homeassistant import config_entries
 import voluptuous as vol
 import logging
@@ -53,7 +55,7 @@ class IcsFlowHandler(config_entries.ConfigFlow):
 		return OptionsFlowHandler(config_entry)
 
 # helper to validate user input
-def check_data(user_input):
+def check_data(user_input, own_id = None):
 	ret = {}
 	try:
 		cal_string = load_data(user_input[CONF_ICS_URL])
@@ -82,6 +84,11 @@ def check_data(user_input):
 		ret["base"] = ERROR_SMALL_LOOKAHEAD
 		return ret
 	
+	if((own_id != user_input[CONF_ID]) and (get_hass() != None)):
+		if(async_generate_entity_id(ENTITY_ID_FORMAT, "ics_" + str(user_input[CONF_ID]), hass=get_hass()) != PLATFORM+".ics_" + str(user_input[CONF_ID])):
+			_LOGGER.error("ICS: ID not unique")
+			ret["base"] = ERROR_ID_NOT_UNIQUE
+			return ret
 	return ret
 
 class OptionsFlowHandler(config_entries.OptionsFlow):
@@ -89,12 +96,13 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 	def __init__(self, config_entry):
 		# store old entry for later
 		self.config_entry = config_entry
+		self.own_id = config_entry.data[CONF_ID]
 
 	# will be called by sending the form, until configuration is done
 	async def async_step_init(self, user_input=None):
 		self._errors = {}
 		if user_input is not None:
-			self._errors = check_data(user_input)
+			self._errors = check_data(user_input,self.own_id)
 			if self._errors == {}:
 				# title doesn't update .. :(
 				return self.async_create_entry(title=user_input[CONF_NAME], data=user_input)

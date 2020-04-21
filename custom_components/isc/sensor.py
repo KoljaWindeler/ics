@@ -11,6 +11,7 @@ import unicodedata
 
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity import Entity, async_generate_entity_id
+from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.components.sensor import PLATFORM_SCHEMA, ENTITY_ID_FORMAT
 from homeassistant.const import (CONF_NAME)
 
@@ -117,7 +118,7 @@ class ics_Sensor(Entity):
 
 	# make sure all elements are timezone aware datetimes
 	def check_fix_date_tz(self, event):
-		if(type(event.dt) is datetime.date):
+		if(isinstance(event.dt, datetime.date)):
 			event.dt = datetime.datetime(event.dt.year,event.dt.month,event.dt.day)
 		try:
 			if(event.dt.tzinfo == None or event.dt.utcoffset() == None):

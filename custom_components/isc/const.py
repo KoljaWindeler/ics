@@ -1,4 +1,5 @@
 from homeassistant.components.sensor import PLATFORM_SCHEMA, ENTITY_ID_FORMAT
+from homeassistant.helpers.entity import async_generate_entity_id
 import homeassistant.helpers.config_validation as cv
 from homeassistant.const import (CONF_NAME)
 import voluptuous as vol
@@ -47,6 +48,7 @@ ERROR_ICS = "invalid_ics"
 ERROR_TIMEFORMAT = "invalid_timeformat"
 ERROR_SMALL_ID = "invalid_small_id"
 ERROR_SMALL_LOOKAHEAD = "invalid_lookahead"
+ERROR_ID_NOT_UNIQUE = "id_not_unique"
 
 # extend schema to load via YAML
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
@@ -62,11 +64,25 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
 	vol.Optional(CONF_SHOW_ONGOING, default=DEFAULT_SHOW_ONGOING): cv.boolean,
 })
 
+myhass = []
+def store_hass(hass):
+	myhass.append(hass)
+
+def get_hass():
+	if not myhass:
+		return None
+	return myhass[0]
+
+def get_next_id():
+	for i in range(1,999):
+		if(async_generate_entity_id(ENTITY_ID_FORMAT, "ics_" + str(i), hass=get_hass()) == PLATFORM+".ics_" + str(i)):
+			return i
+	return 999
+
 # create form for UI setup
 def create_form(user_input):
 	name = ""
 	url = ""
-	id = DEFAULT_ID
 	timeformat = DEFAULT_TIMEFORMAT
 	starts_with = DEFAULT_SW
 	lookahead = DEFAULT_LOOKAHEAD
@@ -74,6 +90,9 @@ def create_form(user_input):
 	force_update =  DEFAULT_FORCE_UPDATE
 	show_remaining = DEFAULT_SHOW_REMAINING
 	show_ongoing = DEFAULT_SHOW_ONGOING
+
+	# generate next available ID
+	id = get_next_id()
 
 	if user_input is not None:
 		if CONF_NAME in user_input:

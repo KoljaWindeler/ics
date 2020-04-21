@@ -10,6 +10,7 @@ from .const import *
 
 async def async_setup(hass, config):
 	# log startup message
+	store_hass(hass)
 	_LOGGER.info(
 		CC_STARTUP_VERSION.format(name=DOMAIN, version=VERSION, issue_link=ISSUE_URL)
 	)
