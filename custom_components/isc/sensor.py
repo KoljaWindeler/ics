@@ -11,7 +11,6 @@ import unicodedata
 
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity import Entity, async_generate_entity_id
-from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.components.sensor import PLATFORM_SCHEMA, ENTITY_ID_FORMAT
 from homeassistant.const import (CONF_NAME)
 
@@ -127,23 +126,45 @@ class ics_Sensor(Entity):
 			pass
 		return event
 
+	# make sure that the UNITL date of the RRULE is the same type as DTSTART is, otherwise recurring_ical_events will crash
+	def check_fix_rrule(self,calendar):
+		fix=0
+		for event in calendar.walk('vevent'):
+			if(event.has_key("RRULE")):
+				if(event["RRULE"].has_key("UNTIL")):
+					if(isinstance(event["DTSTART"].dt,datetime.date) and isinstance(event["RRULE"]["UNTIL"][0],datetime.datetime)):
+						event["RRULE"]["UNTIL"][0] = event["RRULE"]["UNTIL"][0].date()
+						fix+=1
+					elif(isinstance(event["DTSTART"].dt,datetime.datetime) and isinstance(event["RRULE"]["UNTIL"][0],datetime.date)):
+						fix+=1
+						d = event["RRULE"]["UNTIL"][0]
+						event["RRULE"]["UNTIL"][0] =  datetime.datetime(d.year,d.month,d.day)
+						if(event["DTSTART"].dt.tzinfo != None):
+							event["RRULE"]["UNTIL"][0] = event["RRULE"]["UNTIL"][0].replace(tzinfo=event["DTSTART"].dt.tzinfo)
+		return fix
+
+
 	def get_data(self):
 		try:
 			cal_string = load_data(self._url)
 			cal = Calendar.from_ical(cal_string)
 
-			# make all item TZ aware
-			for event in cal.walk('vevent'):
-				if(event.has_key("DTSTART")):
-					event["DTSTART"] = self.check_fix_date_tz(event["DTSTART"])
-				if(event.has_key("DTEND")):
-					event["DTEND"] = self.check_fix_date_tz(event["DTEND"])
+			# fix RRULE
+			_LOGGER.debug(f"fixed {self.check_fix_rrule(cal)} RRule dates")
 			
 			# define calendar range
 			start_date = datetime.datetime.now().replace(minute=0, hour=0, second=0, microsecond=0)
 			end_date = start_date + datetime.timedelta(days=self._lookahead)
 
 			reoccuring_events = recurring_ical_events.of(cal).between(start_date, end_date)
+
+			# make all item TZ aware datetime
+			for event in reoccuring_events:
+				if(event.has_key("DTSTART")):
+					event["DTSTART"] = self.check_fix_date_tz(event["DTSTART"])
+				if(event.has_key("DTEND")):
+					event["DTEND"] = self.check_fix_date_tz(event["DTEND"])
+	
 			try:
 				reoccuring_events = sorted(reoccuring_events, key=lambda x: x["DTSTART"].dt, reverse=False)
 			except:
@@ -161,6 +182,10 @@ class ics_Sensor(Entity):
 			if(len(reoccuring_events)>0):
 				for e in reoccuring_events:
 					event_date = e["DTSTART"].dt
+					if(e.has_key("DTEND")):
+						event_end_date = e["DTEND"].dt
+					else:
+						event_end_date = event_date
 
 					event_summary = ""
 					if(e.has_key("SUMMARY")):
@@ -168,29 +193,29 @@ class ics_Sensor(Entity):
 					elif(self._show_blank):
 						event_summary = self.fix_text(self._show_blank)
 
+					now = datetime.datetime.now(get_localzone())
+
 					if(event_summary):
-						if(event_summary.startswith(self.fix_text(self._sw)) and (event_date>datetime.datetime.now(get_localzone()) or self._show_ongoing )):
-							if(et == None):
-								self.ics['pickup_date'] = event_date.strftime(self._timeformat)
-								self.ics['extra']['remaining'] = (event_date.date() - datetime.datetime.now(get_localzone()).date()).days
-								self.ics['extra']['description'] = event_summary
-								self.ics['extra']['start'] = event_date
-								if(e.has_key("DTEND")):
-									self.ics['extra']['end'] = e["DTEND"].dt
+						if(event_summary.startswith(self.fix_text(self._sw))):
+							if((event_date > now) or (self._show_ongoing and event_end_date > now)):
+								if(et == None):
+									self.ics['pickup_date'] = event_date.strftime(self._timeformat)
+									self.ics['extra']['remaining'] = (event_date.date() - now.date()).days
+									self.ics['extra']['description'] = event_summary
+									self.ics['extra']['start'] = event_date
+									self.ics['extra']['end'] = event_end_date
+									if(e.has_key("LOCATION")):
+										self.ics['extra']['location'] = self.fix_text(e["LOCATION"])
+									et = event_date
+								elif(event_date == et):
+									self.ics['extra']['description'] += " / " + event_summary
+									if(e.has_key("LOCATION")):
+										self.ics['extra']['location'] += " / " + self.fix_text(e["LOCATION"])
+									# store earliest end time
+									if(self.ics['extra']['end'] > e["DTEND"].dt):
+										self.ics['extra']['end'] = e["DTEND"].dt
 								else:
-									self.ics['extra']['end'] = event_date
-								if(e.has_key("LOCATION")):
-									self.ics['extra']['location'] = self.fix_text(e["LOCATION"])
-								et = event_date
-							elif(event_date == et):
-								self.ics['extra']['description'] += " / " + event_summary
-								if(e.has_key("LOCATION")):
-									self.ics['extra']['location'] += " / " + self.fix_text(e["LOCATION"])
-								# store earliest end time
-								if(self.ics['extra']['end'] > e["DTEND"].dt):
-									self.ics['extra']['end'] = e["DTEND"].dt
-							else:
-								break
+									break
 		except:
 			self.ics['pickup_date'] = "failure"
 			self.exc()
