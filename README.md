@@ -130,6 +130,9 @@ Key | Type | Required | Default | Description
 `force_update` | `int` | `false` | `0` | Force to update the data with given intervall (seconds). This can be useful if the calendar is very dynamic, but is pointless for almost static calendars. The calendar will reload at midnight and once the (start/end) of the event is over regardless of this setting. 0 = Disabled
 `show_remaining` | `bool` | `false` | `true` | Show the remaining days in the sensor state, close to the date.
 `show_ongoing` | `bool` | `false` | `false` | Show events that have already started but not finished.
+`group_events` | `bool` | `false` | `true` | Show events with same start date as one event
+`n_skip` | `int` | `false` | `0` | Skip the given amount of events, useful to show the appointment AFTER the next appointment
+`description_in_state` | `bool` | `false` | `false` | Show the title of the events in the state
 
 ## Automation
 
@@ -169,3 +172,6 @@ script:
              {% if is_state_attr("sensor.ics_2", "remaining",1) %} {{states.sensor.ics_2.attributes.friendly_name}} pickup tomorrow.{% endif %}
              {% if is_state_attr("sensor.ics_3", "remaining",1) %} {{states.sensor.ics_3.attributes.friendly_name}} pickup tomorrow.{% endif %}
 ```
+
+## Tests
+TODO .. 
