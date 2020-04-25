@@ -89,6 +89,8 @@ def get_hass():
 	return myhass[0]
 
 def get_next_id():
+	if(get_hass() == None):
+		return 1
 	for i in range(1,999):
 		if(async_generate_entity_id(ENTITY_ID_FORMAT, "ics_" + str(i), hass=get_hass()) == PLATFORM+".ics_" + str(i)):
 			return i
