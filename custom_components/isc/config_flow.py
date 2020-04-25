@@ -30,24 +30,24 @@ class IcsFlowHandler(config_entries.ConfigFlow):
 		self._errors = {}
 		if user_input is not None:
 			# there is user input, check and save if valid (see const.py)
-			self._errors = check_data(user_input)
+			self._errors = check_data(user_input,self.hass)
 			if self._errors == {}:
 				self.data = user_input
 				return await self.async_step_finish()
 		# no user input, or error. Show form
-		return self.async_show_form(step_id="user", data_schema=vol.Schema(create_form(1, user_input)), errors=self._errors)
+		return self.async_show_form(step_id="user", data_schema=vol.Schema(create_form(1, user_input, self.hass)), errors=self._errors)
 
 	# will be called by sending the form, until configuration is done
 	async def async_step_finish(self, user_input=None):   # pylint: disable=unused-argument
 		self._errors = {}
 		if user_input is not None:
 			# there is user input, check and save if valid (see const.py)
-			self._errors = check_data(user_input)
+			self._errors = check_data(user_input, self.hass)
 			if self._errors == {}:
 				user_input.update(self.data)
 				return self.async_create_entry(title=user_input[CONF_NAME], data=user_input)
 		# no user input, or error. Show form
-		return self.async_show_form(step_id="finish", data_schema=vol.Schema(create_form(2, user_input)), errors=self._errors)
+		return self.async_show_form(step_id="finish", data_schema=vol.Schema(create_form(2, user_input, self.hass)), errors=self._errors)
 
 	# TODO .. what is this good for?
 	async def async_step_import(self, user_input):  # pylint: disable=unused-argument
@@ -79,7 +79,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 		self._errors = {}
 		if user_input is not None:
 			# there is user input, check and save if valid (see const.py)
-			self._errors = check_data(user_input,self.own_id)
+			self._errors = check_data(user_input, self.hass, self.own_id)
 			if self._errors == {}:
 				self.data.update(user_input)
 				return await self.async_step_finish()
@@ -87,7 +87,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 			# if we came straight from init
 			user_input = self.data
 		# no user input, or error. Show form
-		return self.async_show_form(step_id="init", data_schema=vol.Schema(create_form(1, user_input)), errors=self._errors)
+		return self.async_show_form(step_id="init", data_schema=vol.Schema(create_form(1, user_input, self.hass)), errors=self._errors)
 
 	# will be called by sending the form, until configuration is done
 	async def async_step_finish(self, user_input=None):   # pylint: disable=unused-argument
@@ -95,8 +95,8 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 		if user_input is not None:
 			self.data.update(user_input)
 			# there is user input, check and save if valid (see const.py)
-			self._errors = check_data(user_input,self.own_id)
+			self._errors = check_data(user_input, self.hass, self.own_id)
 			if self._errors == {}:
 				return self.async_create_entry(title=self.data[CONF_NAME], data=self.data)
 		# no user input, or error. Show form
-		return self.async_show_form(step_id="finish", data_schema=vol.Schema(create_form(2, self.data)), errors=self._errors)
+		return self.async_show_form(step_id="finish", data_schema=vol.Schema(create_form(2, self.data, self.hass)), errors=self._errors)

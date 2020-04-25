@@ -79,25 +79,17 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
 	vol.Optional(CONF_DESCRIPTION_IN_STATE, default=DEFAULT_DESCRIPTION_IN_STATE): cv.boolean,
 })
 
-myhass = []
-def store_hass(hass):
-	myhass.append(hass)
 
-def get_hass():
-	if not myhass:
-		return None
-	return myhass[0]
-
-def get_next_id():
-	if(get_hass() == None):
+def get_next_id(hass):
+	if(hass == None):
 		return 1
 	for i in range(1,999):
-		if(async_generate_entity_id(ENTITY_ID_FORMAT, "ics_" + str(i), hass=get_hass()) == PLATFORM+".ics_" + str(i)):
+		if(async_generate_entity_id(ENTITY_ID_FORMAT, "ics_" + str(i), hass=hass) == PLATFORM+".ics_" + str(i)):
 			return i
 	return 999
 
 
-def ensure_config(user_input):
+def ensure_config(user_input, hass):
 	out = {}
 	out[CONF_NAME] = ""
 	out[CONF_ICS_URL] = ""
@@ -111,7 +103,7 @@ def ensure_config(user_input):
 	out[CONF_GROUP_EVENTS] = DEFAULT_GROUP_EVENTS
 	out[CONF_N_SKIP] = DEFAULT_N_SKIP
 	out[CONF_DESCRIPTION_IN_STATE] = DEFAULT_DESCRIPTION_IN_STATE
-	out[CONF_ID] = get_next_id()
+	out[CONF_ID] = get_next_id(hass)
 
 	if user_input is not None:
 		if CONF_NAME in user_input:
@@ -146,7 +138,7 @@ def ensure_config(user_input):
 
 
 # helper to validate user input
-def check_data(user_input, own_id = None):
+def check_data(user_input, hass, own_id = None):
 	ret = {}
 	if((CONF_ICS_URL) in user_input):
 		try:
@@ -183,8 +175,8 @@ def check_data(user_input, own_id = None):
 			return ret
 	
 	if((CONF_ID) in user_input):
-		if((own_id != user_input[CONF_ID]) and (get_hass() != None)):
-			if(async_generate_entity_id(ENTITY_ID_FORMAT, "ics_" + str(user_input[CONF_ID]), hass=get_hass()) != PLATFORM+".ics_" + str(user_input[CONF_ID])):
+		if((own_id != user_input[CONF_ID]) and (hass != None)):
+			if(async_generate_entity_id(ENTITY_ID_FORMAT, "ics_" + str(user_input[CONF_ID]), hass=hass) != PLATFORM+".ics_" + str(user_input[CONF_ID])):
 				_LOGGER.error("ICS: ID not unique")
 				ret["base"] = ERROR_ID_NOT_UNIQUE
 				return ret
@@ -198,8 +190,8 @@ def check_data(user_input, own_id = None):
 
 
 # create form for UI setup
-def create_form(page, user_input):
-	user_input = ensure_config(user_input)
+def create_form(page, user_input, hass):
+	user_input = ensure_config(user_input, hass)
 
 	data_schema = OrderedDict()
 	if(page == 1):
