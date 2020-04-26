@@ -10,7 +10,8 @@ Platform | Description
 -- | --
 `sensor` | Show date and remaining days to event
 
-<img src="./images/example.png" alt="drawing" width="450"/>
+![Example](images/example.png)
+
 
 ## Features
 
@@ -182,16 +183,17 @@ script:
 Show the next n-Events. Simply by creating three sensors with `n_skip:0 / n_skip:1 / n_skip:2` <br>
 Setting 'description_in_state: True` will also show the title.
 
-<img src="./images/feiertage.png" alt="drawing" width="450"/>
+
+![Example](images/feiertage.png)
 
 Or list the next sport events
 
-<img src="./images/fussi.png" alt="drawing" width="450"/>
+![Example](images/fussi.png)
 
 # Advance feature
 Reoccuring events, events at the same time, skippig events (EXDATE) ... all that can have quite some complexity to it. 
 
-<img src="./images/complex_cal.png" alt="drawing" width="600"/>
+![Example](images/complex_cal.png)
 
 The image above shows my test calendar (year = 2030! thus all lookahead must be >> 365)
 
@@ -215,7 +217,7 @@ sensor:
 ```
 Without advance options (all defaults) we'll get a sensor, showing both event1 and event3 because grouping is enabled (`group_events: True`). 
 
-<img src="./images/1_reg.png" alt="drawing" width="300"/>
+![Example](images/1_reg.png)
 
 `Setting group_event: False` would either show event1 or event3 (depends on their order in the ics file)
 
