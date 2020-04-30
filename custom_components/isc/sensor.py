@@ -78,7 +78,7 @@ class ics_Sensor(Entity):
 			'extra': {
 				'start': None,
 				'end': None,
-				'remaining': -1,
+				'remaining': -999,
 				'description': "-",
 				'location': '-',
 				'last_updated': None,
@@ -192,7 +192,7 @@ class ics_Sensor(Entity):
 			self.ics['extra']['reload_at'] = None
 			self.ics['extra']['start'] = None
 			self.ics['extra']['end'] = None
-			self.ics['extra']['remaining'] = -1
+			self.ics['extra']['remaining'] = -999
 			self.ics['extra']['description'] = "-"
 			self.ics['extra']['location'] = "-"
 
