@@ -57,6 +57,7 @@ class ics_Sensor(Entity):
 		self._group_events = config.get(CONF_GROUP_EVENTS)
 		self._n_skip = config.get(CONF_N_SKIP)
 		self._description_in_state = config.get(CONF_DESCRIPTION_IN_STATE)
+		self._icon = config.get(CONF_ICON)
 
 		_LOGGER.debug("ICS config: ")
 		_LOGGER.debug("\tname: " + self._name)
@@ -72,6 +73,7 @@ class ics_Sensor(Entity):
 		_LOGGER.debug("\tgroup_events: " + str(self._group_events))
 		_LOGGER.debug("\tn_skip: " + str(self._n_skip))
 		_LOGGER.debug("\tdescription_in_state: " + str(self._description_in_state))
+		_LOGGER.debug("\ticon: " + str(self._icon))
 
 		self._lastUpdate = -1
 		self.ics = {
@@ -107,7 +109,7 @@ class ics_Sensor(Entity):
 	@property
 	def icon(self):
 		"""Return the icon to use in the frontend."""
-		return ICON
+		return self._icon
 
 	def fix_text(self, s):
 		"""Remove Umlaute."""

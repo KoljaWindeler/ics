@@ -75,6 +75,7 @@ Key | Type | Required | Default | Description
 `group_events` | `bool` | `false` | `true` | Show events with same start date as one event
 `n_skip` | `int` | `false` | `0` | Skip the given amount of events, useful to show the appointment AFTER the next appointment
 `description_in_state` | `bool` | `false` | `false` | Show the title of the events in the state
+`icon` | `string` | `false` | `mdi:calendar` | MDI Icon string, check https://materialdesignicons.com/
 
 ## GUI configuration 
 

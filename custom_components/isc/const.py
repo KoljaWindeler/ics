@@ -15,13 +15,13 @@ import requests
 _LOGGER = logging.getLogger(__name__)
 
 # generals
-ICON = 'mdi:calendar'
 DOMAIN = "ics"
 PLATFORM = "sensor"
 VERSION = "1.1.0"
 ISSUE_URL = "https://github.com/koljawindeler/ics/issues"
 
 # configuration
+CONF_ICON = "icon"
 CONF_ICS_URL = "url"
 CONF_NAME = "name"
 CONF_ID = "id"
@@ -37,6 +37,7 @@ CONF_N_SKIP = "n_skip"
 CONF_DESCRIPTION_IN_STATE = "description_in_state"
 
 # defaults
+DEFAULT_ICON = 'mdi:calendar'
 DEFAULT_NAME = "ics_sensor"
 DEFAULT_SW = ""
 DEFAULT_ID = 1
@@ -74,6 +75,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
 	vol.Optional(CONF_GROUP_EVENTS, default=DEFAULT_GROUP_EVENTS): cv.boolean,
 	vol.Optional(CONF_N_SKIP, default=DEFAULT_N_SKIP): vol.Coerce(int),
 	vol.Optional(CONF_DESCRIPTION_IN_STATE, default=DEFAULT_DESCRIPTION_IN_STATE): cv.boolean,
+	vol.Optional(CONF_ICON, default=DEFAULT_ICON): cv.string,
 })
 
 
@@ -102,6 +104,7 @@ def ensure_config(user_input, hass):
 	out[CONF_GROUP_EVENTS] = DEFAULT_GROUP_EVENTS
 	out[CONF_N_SKIP] = DEFAULT_N_SKIP
 	out[CONF_DESCRIPTION_IN_STATE] = DEFAULT_DESCRIPTION_IN_STATE
+	out[CONF_ICON] = DEFAULT_ICON
 	out[CONF_ID] = get_next_id(hass)
 
 	if user_input is not None:
@@ -133,6 +136,8 @@ def ensure_config(user_input, hass):
 			out[CONF_N_SKIP] = user_input[CONF_N_SKIP]
 		if CONF_DESCRIPTION_IN_STATE in user_input:
 			out[CONF_DESCRIPTION_IN_STATE] = user_input[CONF_DESCRIPTION_IN_STATE]
+		if CONF_ICON in user_input:
+			out[CONF_ICON] = user_input[CONF_ICON]
 	return out
 
 
@@ -201,6 +206,7 @@ def create_form(page, user_input, hass):
 		data_schema[vol.Optional(CONF_TIMEFORMAT, default=user_input[CONF_TIMEFORMAT])] = str
 		data_schema[vol.Optional(CONF_SW, default=user_input[CONF_SW])] = str
 		data_schema[vol.Optional(CONF_LOOKAHEAD, default=user_input[CONF_LOOKAHEAD])] = int
+		data_schema[vol.Optional(CONF_ICON, default=user_input[CONF_ICON])] = str
 
 	elif(page == 2):
 		data_schema[vol.Optional(CONF_SHOW_BLANK, default=user_input[CONF_SHOW_BLANK])] = str
