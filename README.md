@@ -93,17 +93,20 @@ sensor:
     name: Packaging
     url: https://www.rmg-gmbh.de/download/Hamb%C3%BChren.ics
     id: 1
+    icon: "mdi:recycle"
 
   - platform: ics
     name: Trash
     url: http://www.zacelle.de/privatkunden/muellabfuhr/abfuhrtermine/?tx_ckcellextermine_pi1%5Bot%5D=148&tx_ckcellextermine_pi1%5Bics%5D=0&tx_ckcellextermine_pi1%5Bstartingpoint%5D=234&type=3333
     id: 2
+    icon: "mdi:trash-can-outline"
 
   - platform: ics
     name: Trash 2
     url: https://www.ab-peine.de/mcalendar/export_termine.php?menuid=185&area=141&year=2020
     startswith: Rest
     id: 3
+    icon: "mdi:trash-can-outline"
 
   - platform: ics
     name: Bio
