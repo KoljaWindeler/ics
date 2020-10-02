@@ -68,6 +68,7 @@ Key | Type | Required | Default | Description
 `timeformat` | `string` | `false` | `"%A, %d.%m.%Y"` | The format that is used to display the date see http://strftime.org/ for more infomation
 `lookahead` | `int` | `false` | `365` | The number of days that limits the forecast. E.g. 1 will only show the events of today
 `startswith` | `string` | `false` | `""` | A filter that will limit the display of events. E.g. if your file contains multiple entries and you only want to know one type at per sensor, simply create multiple sensors and filter. Have a look at sensor 3 and 4 above. startswith: Bio will ohne show events that start with Bio.
+`contains` | `string` | `false` | `""` | A filter like startswith, but this will search within the string instead of the start.
 `show_blank` | `string` | `false` | `""` | Indicates whether to show empty events (events without title), and what should be used as title instead. e.g. "Meeting123" would show events with empty title with the string "Meeting123". An empty string (default) or " " will avoid showing blank events.
 `force_update` | `int` | `false` | `0` | Force to update the data with given intervall (seconds). This can be useful if the calendar is very dynamic, but pointless for almost static calendars. The calendar will reload at midnight and once the (start/end) of the event is over regardless of this setting. 0 = Disabled
 `show_remaining` | `bool` | `false` | `true` | Show the remaining days in the sensor state, close to the date.

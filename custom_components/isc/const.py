@@ -18,7 +18,7 @@ _LOGGER = logging.getLogger(__name__)
 # generals
 DOMAIN = "ics"
 PLATFORM = "sensor"
-VERSION = "1.1.0"
+VERSION = "1.2.0"
 ISSUE_URL = "https://github.com/koljawindeler/ics/issues"
 
 # configuration
@@ -29,6 +29,7 @@ CONF_ID = "id"
 CONF_TIMEFORMAT = "timeformat"
 CONF_LOOKAHEAD = "lookahead"
 CONF_SW = "startswith"
+CONF_CONTAINS = "contains"
 CONF_SHOW_BLANK = "show_blank"
 CONF_FORCE_UPDATE = "force_update"
 CONF_SHOW_REMAINING = "show_remaining"
@@ -40,8 +41,9 @@ CONF_DESCRIPTION_IN_STATE = "description_in_state"
 # defaults
 DEFAULT_ICON = 'mdi:calendar'
 DEFAULT_NAME = "ics_sensor"
-DEFAULT_SW = ""
 DEFAULT_ID = 1
+DEFAULT_SW = ""
+DEFAULT_CONTAINS = ""
 DEFAULT_TIMEFORMAT = "%A, %d.%m.%Y"
 DEFAULT_LOOKAHEAD = 365
 DEFAULT_SHOW_BLANK = ""
@@ -68,6 +70,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
 	vol.Optional(CONF_ID, default=DEFAULT_ID): vol.Coerce(int),
 	vol.Optional(CONF_TIMEFORMAT, default=DEFAULT_TIMEFORMAT): cv.string,
 	vol.Optional(CONF_SW, default=DEFAULT_SW): cv.string,
+	vol.Optional(CONF_CONTAINS, default=DEFAULT_CONTAINS): cv.string,
 	vol.Optional(CONF_LOOKAHEAD, default=DEFAULT_LOOKAHEAD): vol.Coerce(int),
 	vol.Optional(CONF_SHOW_BLANK, default=DEFAULT_SHOW_BLANK): cv.string,
 	vol.Optional(CONF_FORCE_UPDATE, default=DEFAULT_FORCE_UPDATE): vol.Coerce(int),
@@ -97,6 +100,7 @@ def ensure_config(user_input, hass):
 	out[CONF_ICS_URL] = ""
 	out[CONF_TIMEFORMAT] = DEFAULT_TIMEFORMAT
 	out[CONF_SW] = DEFAULT_SW
+	out[CONF_CONTAINS] = DEFAULT_CONTAINS
 	out[CONF_LOOKAHEAD] = DEFAULT_LOOKAHEAD
 	out[CONF_SHOW_BLANK] = DEFAULT_SHOW_BLANK
 	out[CONF_FORCE_UPDATE] = DEFAULT_FORCE_UPDATE
@@ -121,6 +125,10 @@ def ensure_config(user_input, hass):
 			out[CONF_SW] = user_input[CONF_SW]
 			if(out[CONF_SW] == " "):
 				out[CONF_SW] = ""
+		if CONF_CONTAINS in user_input:
+			out[CONF_CONTAINS] = user_input[CONF_CONTAINS]
+			if(out[CONF_CONTAINS] == " "):
+				out[CONF_CONTAINS] = ""
 		if CONF_LOOKAHEAD in user_input:
 			out[CONF_LOOKAHEAD] = user_input[CONF_LOOKAHEAD]
 		if CONF_SHOW_REMAINING in user_input:
@@ -206,6 +214,7 @@ def create_form(page, user_input, hass):
 		data_schema[vol.Required(CONF_ID, default=user_input[CONF_ID])] = int
 		data_schema[vol.Optional(CONF_TIMEFORMAT, default=user_input[CONF_TIMEFORMAT])] = str
 		data_schema[vol.Optional(CONF_SW, default=user_input[CONF_SW])] = str
+		data_schema[vol.Optional(CONF_CONTAINS, default=user_input[CONF_CONTAINS])] = str
 		data_schema[vol.Optional(CONF_LOOKAHEAD, default=user_input[CONF_LOOKAHEAD])] = int
 		data_schema[vol.Optional(CONF_ICON, default=user_input[CONF_ICON])] = str
 

@@ -10,7 +10,8 @@
                     "url": "URLen til ics-filen. Vanligvis http://domene/kalender.ics, men kan også være lokal fil:///tmp/test.ics ",
                     "id": "Unikt nummer for å identifisere sensoren din senere. f.eks. id = 1 resulterer i sensor.ical_1",
                     "timeformat": "Tidsformat (se http://strftime.org/).",
-                    "startswith": "Filter, se lenke over for mer info" ,
+                    "startswith": "Startswith Filter, se lenke over for mer info" ,
+                    "contains": "Contains Filter, se lenke over for mer info" ,
                     "lookahead": "Lookahead",
                     "icon": "Ikon (se https://materialdesignicons.com/)."
                 }
@@ -20,7 +21,7 @@
                 "description": "Skriv inn sensornavnet og konfigurer sensorparametrene. Mer info på https://github.com/koljawindeler/ics#configuration-options.\n Side 2/2",
                 "data": {
                     "show_blank": "Vis hendelser uten tittel",
-                    "force_update": "Tving periodiske oppdateringer",
+                    "force_update": "Tving periodiske oppdateringer (sec)",
                     "show_remaining": "Vis gjenværende dager",
                     "show_ongoing": "Vis hendelser som pågå",
                     "group_events": "Gruppearrangementer (vis flere)",
@@ -49,7 +50,8 @@
                     "url": "URLen til ics-filen. Vanligvis http://domene/kalender.ics, men kan også være lokal fil:///tmp/test.ics ",
                     "id": "Unikt nummer for å identifisere sensoren din senere. f.eks. id = 1 resulterer i sensor.ical_1",
                     "timeformat": "Tidsformat (se http://strftime.org/).",
-                    "startswith": "Filter, se lenke over for mer info" ,
+                    "startswith": "Startswith Filter, se lenke over for mer info" ,
+                    "contains": "Contains Filter, se lenke over for mer info" ,
                     "lookahead": "Se fremover",
                     "icon": "Ikon (se https://materialdesignicons.com/)."
                 }
@@ -59,7 +61,7 @@
                 "description": "Skriv inn sensornavnet og konfigurer sensorparametrene. Mer info på https://github.com/koljawindeler/ics#configuration-options.\n Side 2/2",
                 "data": {
                     "show_blank": "Vis hendelser uten tittel",
-                    "force_update": "Tving periodiske oppdateringer",
+                    "force_update": "Tving periodiske oppdateringer (sec)",
                     "show_remaining": "Vis gjenværende dager",
                     "show_ongoing": "Vis hendelser som pågår",
                     "group_events": "Gruppearrangementer (vis flere)",
