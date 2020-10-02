@@ -1,0 +1,81 @@
+{
+    "config": {
+        "title": "ICS - Kalender",
+        "step": {
+            "user": {
+                "title": "ICS",
+                "description": "Skriv inn sensornavnet og konfigurer sensorparametrene. Mer info på https://github.com/koljawindeler/ics#configuration-options.\n Side 1/2",
+                "data": {
+                    "name": "Vennlig navn (kan endres senere) og tittel for konfigurasjonsflyten (fikse)",
+                    "url": "URLen til ics-filen. Vanligvis http://domene/kalender.ics, men kan også være lokal fil:///tmp/test.ics ",
+                    "id": "Unikt nummer for å identifisere sensoren din senere. f.eks. id = 1 resulterer i sensor.ical_1",
+                    "timeformat": "Tidsformat (se http://strftime.org/).",
+                    "startswith": "Filter, se lenke over for mer info" ,
+                    "lookahead": "Lookahead",
+                    "icon": "Ikon (se https://materialdesignicons.com/)."
+                }
+            },
+            "finish": {
+                "title": "ICS",
+                "description": "Skriv inn sensornavnet og konfigurer sensorparametrene. Mer info på https://github.com/koljawindeler/ics#configuration-options.\n Side 2/2",
+                "data": {
+                    "show_blank": "Vis hendelser uten tittel",
+                    "force_update": "Tving periodiske oppdateringer",
+                    "show_remaining": "Vis gjenværende dager",
+                    "show_ongoing": "Vis hendelser som pågå",
+                    "group_events": "Gruppearrangementer (vis flere)",
+                    "n_skip": "Antall hendelser å hoppe over",
+                    "description_in_state": "Vis beskrivelse i tilstand"
+                }
+            }
+        },
+        "error": {
+            "invalid_url": "URL-en er ikke gyldig, kunne ikke laste ned data.",
+            "invalid_ics": "Den nedlastede filen kan ikke analyseres, ikke en gyldig ICS-fil.",
+            "invalid_timeformat": "Tidsformatet er ikke gyldig (se http://strftime.org/)",
+            "invalid_small_id": "ID-en må være> = 0",
+            "invalid_lookahead": "Utseendehodet må være> = 1",
+            "id_not_unique": "Den valgte ID-en er ikke unik",
+            "skip_negative": "Hopp over verdien kan ikke være negativ"
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "ICS",
+                "description": "Skriv inn sensornavnet og konfigurer sensorparametrene. Mer info på https://github.com/koljawindeler/ics#configuration-options.\n Side 1/2",
+                "data": {
+                    "name": "Vennlig navn (kan endres senere) og tittel for konfigurasjonsflyten (fikse)",
+                    "url": "URLen til ics-filen. Vanligvis http://domene/kalender.ics, men kan også være lokal fil:///tmp/test.ics ",
+                    "id": "Unikt nummer for å identifisere sensoren din senere. f.eks. id = 1 resulterer i sensor.ical_1",
+                    "timeformat": "Tidsformat (se http://strftime.org/).",
+                    "startswith": "Filter, se lenke over for mer info" ,
+                    "lookahead": "Se fremover",
+                    "icon": "Ikon (se https://materialdesignicons.com/)."
+                }
+            },
+            "finish": {
+                "title": "ICS",
+                "description": "Skriv inn sensornavnet og konfigurer sensorparametrene. Mer info på https://github.com/koljawindeler/ics#configuration-options.\n Side 2/2",
+                "data": {
+                    "show_blank": "Vis hendelser uten tittel",
+                    "force_update": "Tving periodiske oppdateringer",
+                    "show_remaining": "Vis gjenværende dager",
+                    "show_ongoing": "Vis hendelser som pågår",
+                    "group_events": "Gruppearrangementer (vis flere)",
+                    "n_skip": "Antall hendelser å hoppe over",
+                    "description_in_state": "Vis beskrivelse i tilstand"
+                }
+            }
+        },
+        "error": {
+            "invalid_url": "URL-en er ikke gyldig, kunne ikke laste ned data.",
+            "invalid_ics": "Den nedlastede filen kan ikke analyseres, ikke en gyldig ICS-fil.",
+            "invalid_timeformat": "Tidsformatet er ikke gyldig (se http://strftime.org/)",
+            "invalid_small_id": "ID-en må være> = 0",
+            "invalid_lookahead": "Utseendehodet må være> = 1",
+            "id_not_unique": "Den valgte ID-en er ikke unik",
+            "skip_negative": "Hopp over verdien kan ikke være negativ"
+        }
+    }
+}
