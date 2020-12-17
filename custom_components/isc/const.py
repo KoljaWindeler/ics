@@ -133,6 +133,8 @@ def ensure_config(user_input, hass):
 			out[CONF_LOOKAHEAD] = user_input[CONF_LOOKAHEAD]
 		if CONF_SHOW_REMAINING in user_input:
 			out[CONF_SHOW_REMAINING] = user_input[CONF_SHOW_REMAINING]
+		if CONF_SHOW_ONGOING in user_input:
+			out[CONF_SHOW_ONGOING] = user_input[CONF_SHOW_ONGOING]
 		if CONF_SHOW_BLANK in user_input:
 			out[CONF_SHOW_BLANK] = user_input[CONF_SHOW_BLANK]
 			if(out[CONF_SHOW_BLANK] == " "):
