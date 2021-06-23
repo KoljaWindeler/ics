@@ -153,12 +153,12 @@ def ensure_config(user_input, hass):
 
 
 # helper to validate user input
-def check_data(user_input, hass, own_id=None):
+async def check_data(user_input, hass, own_id=None):
 	"""Check validity of the provided date."""
 	ret = {}
 	if(CONF_ICS_URL in user_input):
 		try:
-			cal_string = load_data(user_input[CONF_ICS_URL])
+			cal_string = await async_load_data(hass, user_input[CONF_ICS_URL])
 			try:
 				Calendar.from_ical(cal_string)
 			except Exception:
@@ -231,7 +231,7 @@ def create_form(page, user_input, hass):
 	return data_schema
 
 
-def load_data(url):
+def _load_data(url):
 	"""Load data from URL, exported to const to call it from sensor and from config_flow."""
 	if(url.lower().startswith("file://")):
 		req = Request(url=url, data=None, headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'})
@@ -240,10 +240,4 @@ def load_data(url):
 
 async def async_load_data(hass, url):
 	"""Load data from URL, exported to const to call it from sensor and from config_flow."""
-	if(url.lower().startswith("file://")):
-		req = Request(url=url, data=None, headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'})
-		ret = urlopen(req)
-		ret = await hass.async_add_executor_job(ret.read)
-		return ret.decode('ISO-8859-1')
-	ret = await hass.async_add_executor_job(partial(requests.get, url, headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'}, allow_redirects=True))
-	return ret.content
+	return await hass.async_add_executor_job(_load_data, url)
