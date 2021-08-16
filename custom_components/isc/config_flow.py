@@ -26,7 +26,7 @@ class IcsFlowHandler(config_entries.ConfigFlow):
 		self._errors = {}
 		if user_input is not None:
 			# there is user input, check and save if valid (see const.py)
-			self._errors = check_data(user_input, self.hass)
+			self._errors = await check_data(user_input, self.hass)
 			if self._errors == {}:
 				self.data = user_input
 				return await self.async_step_finish()
@@ -39,7 +39,7 @@ class IcsFlowHandler(config_entries.ConfigFlow):
 		self._errors = {}
 		if user_input is not None:
 			# there is user input, check and save if valid (see const.py)
-			self._errors = check_data(user_input, self.hass)
+			self._errors = await check_data(user_input, self.hass)
 			if self._errors == {}:
 				user_input.update(self.data)
 				return self.async_create_entry(title=user_input[CONF_NAME], data=user_input)
@@ -81,7 +81,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 		self._errors = {}
 		if user_input is not None:
 			# there is user input, check and save if valid (see const.py)
-			self._errors = check_data(user_input, self.hass, self.own_id)
+			self._errors = await check_data(user_input, self.hass, self.own_id)
 			if self._errors == {}:
 				self.data.update(user_input)
 				return await self.async_step_finish()
@@ -98,7 +98,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 		if user_input is not None:
 			self.data.update(user_input)
 			# there is user input, check and save if valid (see const.py)
-			self._errors = check_data(user_input, self.hass, self.own_id)
+			self._errors = await check_data(user_input, self.hass, self.own_id)
 			if self._errors == {}:
 				return self.async_create_entry(title=self.data[CONF_NAME], data=self.data)
 		# no user input, or error. Show form
