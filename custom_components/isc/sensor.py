@@ -19,6 +19,7 @@ import recurring_ical_events
 import datetime
 import traceback
 from .const import *
+import re
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -49,6 +50,7 @@ class ics_Sensor(Entity):
 		self._name = config.get(CONF_NAME)
 		self._sw = config.get(CONF_SW)
 		self._contains = config.get(CONF_CONTAINS)
+		self._regex = config.get(CONF_REGEX)
 		self._timeformat = config.get(CONF_TIMEFORMAT)
 		self._lookahead = config.get(CONF_LOOKAHEAD)
 		self._show_blank = config.get(CONF_SHOW_BLANK)
@@ -66,6 +68,7 @@ class ics_Sensor(Entity):
 		_LOGGER.debug("\turl: " + self._url)
 		_LOGGER.debug("\tsw: " + self._sw)
 		_LOGGER.debug("\tcontains: " + self._contains)
+		_LOGGER.debug("\tregex: " + self._regex)
 		_LOGGER.debug("\ttimeformat: " + self._timeformat)
 		_LOGGER.debug("\tlookahead: " + str(self._lookahead))
 		_LOGGER.debug("\tshow_blank: " + str(self._show_blank))
@@ -163,6 +166,11 @@ class ics_Sensor(Entity):
 						event["RRULE"]["UNTIL"][0] = event["RRULE"]["UNTIL"][0].replace(tzinfo=datetime.timezone.utc)
 		return fix
 
+	def matches_regex(self, summary):
+		"""Check for regex Event"""
+		match = re.fullmatch(self._regex, summary)
+		return match
+
 	async def get_data(self):
 		"""Update the actual data."""
 		try:
@@ -227,7 +235,8 @@ class ics_Sensor(Entity):
 
 					if(event_summary):
 						if(event_summary.lower().startswith(self.fix_text(self._sw).lower()) and
-						   event_summary.lower().find(self.fix_text(self._contains).lower())>=0 ):
+						event_summary.lower().find(self.fix_text(self._contains).lower())>=0 and
+						self.matches_regex(event_summary)):
 							if((event_date > now) or (self._show_ongoing and event_end_date > now)):
 								# logic to skip events, but save certain details,
 								# e.g. reload / and timeslot for grouping
