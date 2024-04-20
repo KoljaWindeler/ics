@@ -3,7 +3,7 @@
   "name": "ics",
   "documentation": "https://github.com/KoljaWindeler/ics/blob/master/README.md",
   "config_flow": true,
-  "version": "20211212.01",
+  "version": "20240420.01",
   "requirements": [
     "recurring-ical-events",
     "icalendar>=4.0.4",
@@ -14,6 +14,7 @@
   ],
   "dependencies": [],
   "codeowners": [
-    "@KoljaWindeler"
+    "@KoljaWindeler",
+    "@joemcc-90"
   ]
 }
