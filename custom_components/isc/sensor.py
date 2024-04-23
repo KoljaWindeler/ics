@@ -95,6 +95,7 @@ class ics_Sensor(Entity):
 		}
 
 		self.entity_id = async_generate_entity_id(ENTITY_ID_FORMAT, "ics_" + str(config.get(CONF_ID)), hass=hass)
+        self._attr_unique_id = self.entity_id
 
 	@property
 	def name(self):
