@@ -22,10 +22,7 @@ async def async_setup_entry(hass, config_entry):
 	)
 	config_entry.add_update_listener(update_listener)
 	# Add sensor
-	hass.async_create_background_task(
-		hass.config_entries.async_forward_entry_setup(config_entry, PLATFORM),
-		name=DOMAIN
-	)
+	await hass.config_entries.async_forward_entry_setup(config_entry, PLATFORM)
 	return True
 
 
@@ -44,7 +41,4 @@ async def update_listener(hass, entry):
 	"""Update listener."""
 	entry.data = entry.options
 	await hass.config_entries.async_forward_entry_unload(entry, PLATFORM)
-	hass.async_create_background_task(
-		hass.config_entries.async_forward_entry_setup(entry, PLATFORM),
-		name=DOMAIN
-	)
+	await hass.config_entries.async_forward_entry_setups(entry, PLATFORM)
