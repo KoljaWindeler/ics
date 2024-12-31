@@ -22,7 +22,7 @@ async def async_setup_entry(hass, config_entry):
 	)
 	config_entry.add_update_listener(update_listener)
 	# Add sensor
-	await hass.config_entries.async_forward_entry_setup(config_entry, PLATFORM)
+	await hass.config_entries.async_forward_entry_setups(config_entry, PLATFORMS)
 	return True
 
 

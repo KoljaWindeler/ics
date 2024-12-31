@@ -18,6 +18,7 @@ _LOGGER = logging.getLogger(__name__)
 # generals
 DOMAIN = "ics"
 PLATFORM = "sensor"
+PLATFORMS = ["sensor"]
 VERSION = "1.2.0"
 ISSUE_URL = "https://github.com/koljawindeler/ics/issues"
 
