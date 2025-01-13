@@ -20,7 +20,8 @@ async def async_setup_entry(hass, config_entry):
 		config_entry,
 		data=ensure_config(config_entry.data, hass)
 	)
-	config_entry.add_update_listener(update_listener)
+	config_entry.add_update_listener(async_update_options)
+
 	# Add sensor
 	await hass.config_entries.async_forward_entry_setups(config_entry, PLATFORMS)
 	return True
@@ -37,8 +38,5 @@ async def async_remove_entry(hass, config_entry):
 		pass
 
 
-async def update_listener(hass, entry):
-	"""Update listener."""
-	entry.data = entry.options
-	await hass.config_entries.async_forward_entry_unload(entry, PLATFORM)
-	await hass.config_entries.async_forward_entry_setups(entry, PLATFORM)
+async def async_update_options(hass, config_entry):
+	hass.config_entries.async_update_entry(config_entry, data=config_entry.options)
