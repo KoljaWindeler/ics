@@ -13,9 +13,10 @@ from homeassistant.components.sensor import ENTITY_ID_FORMAT
 from homeassistant.const import (CONF_NAME)
 
 
-from icalendar import Calendar
 from tzlocal import get_localzone
+import icalendar
 import recurring_ical_events
+import pytz
 import datetime
 import traceback
 from .const import *
@@ -176,7 +177,8 @@ class ics_Sensor(Entity):
 		"""Update the actual data."""
 		try:
 			cal_string = await async_load_data(self.hass, self._url)
-			cal = Calendar.from_ical(cal_string)
+			icalendar.use_pytz()
+			cal = icalendar.Calendar.from_ical(cal_string)
 
 			# fix RRULE
 			_LOGGER.debug(f"fixed {self.check_fix_rrule(cal)} RRule dates")

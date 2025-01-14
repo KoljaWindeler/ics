@@ -6,11 +6,12 @@
   "version": "20250113.01",
   "requirements": [
     "recurring-ical-events",
-    "icalendar>=4.0.4",
+    "icalendar>=6.0.0",
     "tzlocal",
     "integrationhelper",
     "voluptuous",
-    "python-dateutil>2.7.3"
+    "python-dateutil>2.7.3",
+    "pytz"
   ],
   "dependencies": [],
   "codeowners": [
