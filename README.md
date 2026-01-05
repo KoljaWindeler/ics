@@ -78,6 +78,10 @@ Key | Type | Required | Default | Description
 `description_in_state` | `bool` | `false` | `false` | Show the title of the events in the state
 `icon` | `string` | `false` | `mdi:calendar` | MDI Icon string, check https://materialdesignicons.com/
 
+`header_name` | `string` | `false` | `""` | (Deprecated) Single header name to send with the request. Use `headers` instead.
+`header_value` | `string` | `false` | `""` | (Deprecated) Value for `header_name`.
+`headers` | `mapping` | `false` | `{}` | Mapping of headers to send with the request. Useful for tokens or custom auth headers.
+
 ## GUI configuration 
 
 As of 2020/04/20 config flow is supported and is the prefered way to setup the integration. (No need to restart Home-Assistant)
@@ -95,6 +99,14 @@ sensor:
     url: https://www.rmg-gmbh.de/download/Hamb%C3%BChren.ics
     id: 1
     icon: "mdi:recycle"
+
+  # Example with custom header (YAML mapping)
+  - platform: ics
+    name: Kolding Calendar
+    url: https://koldingivapi.infovision.dk/api/publiccitizen/container/65557/collectioncalendar.ics
+    id: 10
+    headers:
+      publicAccessToken: __NetDialogCitizenPublicAccessToken__
 
   - platform: ics
     name: Trash
@@ -144,6 +156,25 @@ sensor:
 
 
 ```
+
+## Header authentication / custom headers
+
+You can send custom HTTP headers with the request. Preferred option (YAML) is to use the `headers` mapping. Example YAML:
+
+```yaml
+  - platform: ics
+    name: Kolding Calendar
+    url: https://koldingivapi.infovision.dk/api/publiccitizen/container/65557/collectioncalendar.ics
+    id: 11
+    headers:
+      publicAccessToken: __NetDialogCitizenPublicAccessToken__
+```
+
+If you configure the integration via the UI there is a `Headers` field on the first page. It accepts either a JSON object or a multiline list of `Name: Value` pairs, for example:
+
+publicAccessToken: __NetDialogCitizenPublicAccessToken__
+
+For backward-compatibility the older `header_name` and `header_value` options are still supported but `headers` (mapping) is recommended.
 
 # Automation
 

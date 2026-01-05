@@ -1,6 +1,9 @@
 """Provide the initial setup."""
 import logging
-from integrationhelper.const import CC_STARTUP_VERSION
+try:
+	from integrationhelper.const import CC_STARTUP_VERSION
+except Exception:
+	CC_STARTUP_VERSION = "{name} {version} started - {issue_link}"
 from .const import *
 
 _LOGGER = logging.getLogger(__name__)

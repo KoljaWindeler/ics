@@ -63,6 +63,12 @@ class ics_Sensor(Entity):
 		self._description_in_state = config.get(CONF_DESCRIPTION_IN_STATE)
 		self._icon = config.get(CONF_ICON)
 		self._user_agent = config.get(CONF_USER_AGENT)
+		# headers: support both a mapping `headers` or single header_name/header_value for backward compatibility
+		self._headers = config.get(CONF_HEADERS) if config.get(CONF_HEADERS) is not None else {}
+		# include single header fields if present
+		if config.get(CONF_HEADER_NAME):
+			self._headers[config.get(CONF_HEADER_NAME)] = config.get(CONF_HEADER_VALUE, "")
+		self._verbose_logging = config.get(CONF_VERBOSE_LOGGING, False)
 
 		_LOGGER.debug("ICS config: ")
 		_LOGGER.debug("\tname: " + self._name)
@@ -82,6 +88,8 @@ class ics_Sensor(Entity):
 		_LOGGER.debug("\tdescription_in_state: " + str(self._description_in_state))
 		_LOGGER.debug("\ticon: " + str(self._icon))
 		_LOGGER.debug("\tuser_agent: " + str(self._user_agent))
+		_LOGGER.debug("\theaders: " + str(self._headers))
+		_LOGGER.debug("\tverbose_logging: " + str(self._verbose_logging))
 
 		self._lastUpdate = -1
 		self.ics = {
@@ -178,7 +186,7 @@ class ics_Sensor(Entity):
 	async def get_data(self):
 		"""Update the actual data."""
 		try:
-			cal_string = await async_load_data(self.hass, self._url, self._user_agent)
+			cal_string = await async_load_data(self.hass, self._url, self._user_agent, headers=self._headers, verbose=self._verbose_logging)
 			icalendar.use_pytz()
 			cal = icalendar.Calendar.from_ical(cal_string)
 

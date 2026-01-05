@@ -40,6 +40,10 @@ CONF_GROUP_EVENTS = "group_events"
 CONF_N_SKIP = "n_skip"
 CONF_DESCRIPTION_IN_STATE = "description_in_state"
 CONF_USER_AGENT = "user_agent"
+CONF_HEADER_NAME = "header_name"
+CONF_HEADER_VALUE = "header_value"
+CONF_HEADERS = "headers"
+CONF_VERBOSE_LOGGING = "verbose_logging"
 
 
 # defaults
@@ -88,6 +92,11 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
 	vol.Optional(CONF_DESCRIPTION_IN_STATE, default=DEFAULT_DESCRIPTION_IN_STATE): cv.boolean,
 	vol.Optional(CONF_ICON, default=DEFAULT_ICON): cv.string,
 	vol.Optional(CONF_USER_AGENT, default=""): cv.string,	
+	vol.Optional(CONF_HEADER_NAME, default=""): cv.string,
+	vol.Optional(CONF_HEADER_VALUE, default=""): cv.string,
+	# YAML: accept a mapping of headers
+	vol.Optional(CONF_HEADERS, default={}): {cv.string: cv.string},
+	vol.Optional(CONF_VERBOSE_LOGGING, default=False): cv.boolean,
 })
 
 
@@ -120,6 +129,10 @@ def ensure_config(user_input, hass):
 	out[CONF_DESCRIPTION_IN_STATE] = DEFAULT_DESCRIPTION_IN_STATE
 	out[CONF_ICON] = DEFAULT_ICON
 	out[CONF_USER_AGENT] = DEFAULT_USER_AGENT
+	out[CONF_HEADER_NAME] = ""
+	out[CONF_HEADER_VALUE] = ""
+	out[CONF_HEADERS] = {}
+	out[CONF_VERBOSE_LOGGING] = False
 	out[CONF_ID] = get_next_id(hass)
 
 	if user_input is not None:
@@ -165,6 +178,34 @@ def ensure_config(user_input, hass):
 			out[CONF_ICON] = user_input[CONF_ICON]
 		if CONF_USER_AGENT in user_input:
 			out[CONF_USER_AGENT] = user_input[CONF_USER_AGENT]
+		if CONF_HEADER_NAME in user_input:
+			out[CONF_HEADER_NAME] = user_input[CONF_HEADER_NAME]
+		if CONF_HEADER_VALUE in user_input:
+			out[CONF_HEADER_VALUE] = user_input[CONF_HEADER_VALUE]
+		if CONF_HEADERS in user_input:
+			# accept either a dict (from YAML) or a string (from UI). If string, try to parse lines or JSON.
+			val = user_input[CONF_HEADERS]
+			if isinstance(val, dict):
+				out[CONF_HEADERS] = val
+			elif isinstance(val, str):
+				val = val.strip()
+				if val == "":
+					out[CONF_HEADERS] = {}
+				else:
+					# try JSON first
+					try:
+						import json
+						out[CONF_HEADERS] = json.loads(val)
+					except Exception:
+						# parse lines like 'Name: Value'
+						headers = {}
+						for line in val.splitlines():
+							if ':' in line:
+								k, v = line.split(':', 1)
+								headers[k.strip()] = v.strip()
+						out[CONF_HEADERS] = headers
+			if CONF_VERBOSE_LOGGING in user_input:
+				out[CONF_VERBOSE_LOGGING] = user_input[CONF_VERBOSE_LOGGING]
 	return out
 
 
@@ -174,7 +215,34 @@ async def check_data(user_input, hass, own_id=None):
 	ret = {}
 	if(CONF_ICS_URL in user_input):
 		try:
-			cal_string = await async_load_data(hass, user_input[CONF_ICS_URL], user_input[CONF_USER_AGENT])
+			# build headers dict from possible sources
+			_headers = {}
+			# YAML/config may provide mapping or UI may provide a string — normalize both
+			if CONF_HEADERS in user_input:
+				val = user_input[CONF_HEADERS]
+				if isinstance(val, dict):
+					_headers.update(val)
+				elif isinstance(val, str):
+					val = val.strip()
+					if val != "":
+						# try JSON first
+						try:
+							import json
+							parsed = json.loads(val)
+							if isinstance(parsed, dict):
+								_headers.update(parsed)
+						except Exception:
+							# parse lines like 'Name: Value'
+							headers = {}
+							for line in val.splitlines():
+								if ':' in line:
+									k, v = line.split(':', 1)
+									headers[k.strip()] = v.strip()
+								_headers.update(headers)
+			# single header fields (backwards compat)
+			if user_input.get(CONF_HEADER_NAME):
+				_headers[user_input.get(CONF_HEADER_NAME)] = user_input.get(CONF_HEADER_VALUE, "")
+			cal_string = await async_load_data(hass, user_input[CONF_ICS_URL], user_input.get(CONF_USER_AGENT, ""), headers=_headers, verbose=user_input.get(CONF_VERBOSE_LOGGING, False))
 			try:
 				Calendar.from_ical(cal_string)
 			except Exception:
@@ -227,6 +295,15 @@ def create_form(page, user_input, hass):
 
 	data_schema = OrderedDict()
 	if(page == 1):
+		# prepare headers default: convert dict to multiline string for the form
+		header_default = ""
+		if isinstance(user_input.get(CONF_HEADERS), dict) and len(user_input.get(CONF_HEADERS))>0:
+			lines = []
+			for k, v in user_input.get(CONF_HEADERS).items():
+				lines.append(f"{k}: {v}")
+			header_default = "\n".join(lines)
+		elif isinstance(user_input.get(CONF_HEADERS), str):
+			header_default = user_input.get(CONF_HEADERS)
 		data_schema[vol.Required(CONF_NAME, default=user_input[CONF_NAME])] = str
 		data_schema[vol.Required(CONF_ICS_URL, default=user_input[CONF_ICS_URL])] = str
 		data_schema[vol.Required(CONF_ID, default=user_input[CONF_ID])] = int
@@ -237,6 +314,7 @@ def create_form(page, user_input, hass):
 		data_schema[vol.Optional(CONF_LOOKAHEAD, default=user_input[CONF_LOOKAHEAD])] = int
 		data_schema[vol.Optional(CONF_ICON, default=user_input[CONF_ICON])] = str
 		data_schema[vol.Optional(CONF_USER_AGENT, default=user_input[CONF_USER_AGENT])] = str
+		data_schema[vol.Optional(CONF_HEADERS, default=header_default)] = str
 
 	elif(page == 2):
 		data_schema[vol.Optional(CONF_SHOW_BLANK, default=user_input[CONF_SHOW_BLANK])] = str
@@ -249,13 +327,49 @@ def create_form(page, user_input, hass):
 	return data_schema
 
 
-def _load_data(url,user_agent):
+def _load_data(url,user_agent, headers=None, header_name=None, header_value=None, verbose=False):
 	"""Load data from URL, exported to const to call it from sensor and from config_flow."""
+	# prepare headers
+	built = {}
+	if headers and isinstance(headers, dict):
+		built.update(headers)
+	# User-Agent preference: explicit user_agent should override existing
+	if user_agent:
+		built['User-Agent'] = user_agent
+	# backward compatibility for single header fields
+	if header_name is not None and header_name != "" and header_value is not None:
+		built[header_name] = header_value
 	if(url.lower().startswith("file://")):
-		req = Request(url=url, data=None, headers={'User-Agent': user_agent})
+		# log curl-equivalent for debugging
+		if verbose:
+			try:
+				curl_parts = ["curl -sS --location --fail"]
+				curl_parts.append(f"'{url}'")
+				for k, v in built.items():
+					curl_parts.append(f"-H '{k}: {v}'")
+				curl_cmd = ' '.join(curl_parts)
+				_LOGGER.debug("ICS fetch (curl): %s", curl_cmd)
+			except Exception:
+				pass
+		req = Request(url=url, data=None, headers=built)
 		return urlopen(req).read().decode('ISO-8859-1')
-	return requests.get(url, headers={'User-Agent': user_agent}, allow_redirects=True).content
+	# log curl-equivalent for debugging
+	if verbose:
+		try:
+			curl_parts = ["curl -sS --location --fail"]
+			curl_parts.append(f"'{url}'")
+			for k, v in built.items():
+				curl_parts.append(f"-H '{k}: {v}'")
+			curl_cmd = ' '.join(curl_parts)
+			_LOGGER.debug("ICS fetch (curl): %s", curl_cmd)
+		except Exception:
+			pass
+	resp = requests.get(url, headers=built, allow_redirects=True)
+	# also log status code for quick diagnostics (only if verbose)
+	if verbose:
+		_LOGGER.debug("ICS fetch response: %s %s", resp.status_code, resp.headers.get('content-type'))
+	return resp.content
 
-async def async_load_data(hass, url, user_agent):
+async def async_load_data(hass, url, user_agent, headers=None, header_name=None, header_value=None, verbose=False):
 	"""Load data from URL, exported to const to call it from sensor and from config_flow."""
-	return await hass.async_add_executor_job(_load_data, url, user_agent)
+	return await hass.async_add_executor_job(_load_data, url, user_agent, headers, header_name, header_value, verbose)
