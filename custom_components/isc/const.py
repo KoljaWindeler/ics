@@ -58,7 +58,7 @@ DEFAULT_SHOW_ONGOING = False
 DEFAULT_GROUP_EVENTS = True
 DEFAULT_N_SKIP = 0
 DEFAULT_DESCRIPTION_IN_STATE = False
-DEFAULT_USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
+DEFAULT_USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
 
 # error
 ERROR_URL = "invalid_url"
